@@ -8,17 +8,19 @@
  */
 public class memHandle {
     private int memLoc;
+    private int memLength;
     
-    memHandle(int loc){
-        setMemLoc(loc);
+    memHandle(int loc, int length){
+        this.memLoc = loc;
+        this.memLength = length;
     }
 
     public int getMemLoc() {
         return memLoc;
     }
-
-    public void setMemLoc(int memLoc) {
-        this.memLoc = memLoc;
+    
+    public int getMemLength() {
+        return memLength;
     }
     
 }

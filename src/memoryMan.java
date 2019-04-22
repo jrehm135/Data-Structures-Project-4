@@ -16,38 +16,57 @@ public class memoryMan {
         currMemSize = memSize;
         biofile = new RandomAccessFile(memoryFile,"rw");
         freeBlocks = new doublyLinkedList<freeBlock>();
-        freeBlocks.insert(new freeBlock(0, memSize));
+        //Only allocate if greater than 0
+        if(memSize > 0) {
+            freeBlocks.insert(new freeBlock(0, memSize));
+        }
     }
 
 
-    memHandle insert(String inputSequence) throws IOException{
+    public memHandle insert(String inputSequence) throws IOException{
         sequence newInsert = new sequence(inputSequence);
-        int insertLoc = getNextMemPosition(newInsert.getLength());
-        if(insertLoc + newInsert.getLength() > currMemSize)
+        int seqLength = newInsert.getLength();
+        int insertLoc = getNextMemPosition(seqLength);
+        if(insertLoc + seqLength > currMemSize)
         {
-            growMemSize();
+            growMemSize(seqLength);
         }
         biofile.seek(insertLoc);
         biofile.write(newInsert.getBytes());
-        return new memHandle(insertLoc);
+        return new memHandle(insertLoc, seqLength);
     }
 
-    int getNextMemPosition(int lengthNeeded) {
+    private int getNextMemPosition(int lengthNeeded) {
         freeBlock cur = freeBlocks.getElement();
         while (freeBlocks.hasNext()) {
-            if (cur.getLength() >= lengthNeeded) {
+            if (cur.getLength() > lengthNeeded) {
+                //Add to position to reflect taken memory
+                int newPos = cur.getPos() + lengthNeeded;
+                //Subtract from size to remove free space
+                int newBlockSize = cur.getLength() - lengthNeeded;
+                cur.setBlock(newPos, newBlockSize);
                 break;
             }
+            else if(cur.getLength() == lengthNeeded) {
+                //If the blocks are equal, simply remove
+                freeBlocks.remove();
+                break;
+            }
+            freeBlocks.next();
+            cur = freeBlocks.getElement();
         }
         return cur.getPos();
     }
     
-    void growMemSize()
+    private void growMemSize(int length)
     {
+        //Move to beginning?
         freeBlocks.moveToHead();
-        freeBlocks.insert(new freeBlock(currMemSize,initMemSize));
+        //Need to check each link to find correct offset to insert
+        //Insert at offset new memory block
+        freeBlocks.insert(new freeBlock(currMemSize, length));
         //mergeBlocks();
-        currMemSize += initMemSize;
+        currMemSize += length;
         System.out.println("Memory size expanded to " + currMemSize + " size.");
     }
 

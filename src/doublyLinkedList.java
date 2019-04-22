@@ -153,6 +153,10 @@ public class doublyLinkedList<T> {
     public T getElement() {
         return curr.element;
     }
+    
+    public void setElement(T e) {
+        curr.element = e;
+    }
 
     /**
      * @param e The element to search the list for

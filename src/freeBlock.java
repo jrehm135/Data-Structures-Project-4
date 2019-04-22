@@ -23,6 +23,11 @@ public class freeBlock{
         return this.length;
     }
     
+    public void setBlock(int pos, int length) {
+        this.pos = pos;
+        this.length = length;
+    }
+    
     public boolean isAdjacent(freeBlock otherBlock) {
         int otherPos = otherBlock.getPos();
         if(this.pos < otherPos) {
