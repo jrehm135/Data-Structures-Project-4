@@ -25,7 +25,7 @@ public class memoryMan {
 
     public memHandle insert(String inputSequence) throws IOException{
         sequence newInsert = new sequence(inputSequence);
-        int seqLength = newInsert.getLength();
+        int seqLength = (int) Math.ceil(newInsert.getLength()/4.0) ;
         int insertLoc = getNextMemPosition(seqLength);
         if(insertLoc + seqLength > currMemSize)
         {
@@ -38,6 +38,10 @@ public class memoryMan {
 
     private int getNextMemPosition(int lengthNeeded) {
         freeBlock cur = freeBlocks.getElement();
+        //Make sure to return the memsize if the value is null
+        if(cur == null) {
+            return currMemSize;
+        }
         while (freeBlocks.hasNext()) {
             if (cur.getLength() > lengthNeeded) {
                 //Add to position to reflect taken memory
@@ -59,13 +63,10 @@ public class memoryMan {
     }
     
     private void growMemSize(int length)
-    {
-        //Move to beginning?
-        freeBlocks.moveToHead();
-        //Need to check each link to find correct offset to insert
-        //Insert at offset new memory block
-        freeBlocks.insert(new freeBlock(currMemSize, length));
-        //mergeBlocks();
+    {        
+        //We aren't making new free blocks, just allocate at memory size
+        //freeBlocks.insert(new freeBlock(currMemSize, length));
+        
         currMemSize += length;
         System.out.println("Memory size expanded to " + currMemSize + " size.");
     }

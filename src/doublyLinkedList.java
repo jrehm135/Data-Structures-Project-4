@@ -41,7 +41,7 @@ public class doublyLinkedList<T> {
         tail = new Node(null);
         head.next = tail;
         tail.previous = head;
-        curr = tail;
+        curr = head;
     }
 
     /**
