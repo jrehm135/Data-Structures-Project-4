@@ -8,15 +8,17 @@
  */
 public class memHandle {
     private int memLoc;
-    private int length;
     
-    memHandle(String sequence){
-        length = sequence.length();
-        
-        //Call insert and grab memory location returned from it
+    memHandle(int loc){
+        setMemLoc(loc);
+    }
+
+    public int getMemLoc() {
+        return memLoc;
+    }
+
+    public void setMemLoc(int memLoc) {
+        this.memLoc = memLoc;
     }
     
-    private int insert() {
-        return 1;
-    }
 }
