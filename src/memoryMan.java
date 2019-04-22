@@ -25,7 +25,7 @@ public class memoryMan {
 
     public memHandle insert(String inputSequence) throws IOException{
         sequence newInsert = new sequence(inputSequence);
-        int seqLength = (int) Math.ceil(newInsert.getLength()/4.0) ;
+        int seqLength = (int) Math.ceil(newInsert.getLength()/4.0);
         int insertLoc = getNextMemPosition(seqLength);
         if(insertLoc + seqLength > currMemSize)
         {
@@ -34,6 +34,31 @@ public class memoryMan {
         biofile.seek(insertLoc);
         biofile.write(newInsert.getBytes());
         return new memHandle(insertLoc, seqLength);
+    }
+    
+    public void remove(memHandle handle){
+        int offset = handle.getMemLoc();
+        int length = handle.getMemLength();
+        
+        //Don't actually need to zero out sequence, just
+        //  add a free block where it was
+        freeBlock cur = freeBlocks.getElement();
+        if(cur == null) {
+            freeBlocks.insert(new freeBlock(offset, length));
+            return;
+        }
+        while (freeBlocks.hasNext()) {
+            if (cur.getPos() < offset) {
+                freeBlocks.next();
+            }
+            else {
+                freeBlocks.insert(new freeBlock(offset, length));
+                return;
+            }
+        }
+        //At this point, we have made it to the end of the list,
+        //  so we add a freeblock to the end
+        freeBlocks.insert(new freeBlock(offset, length));
     }
 
     private int getNextMemPosition(int lengthNeeded) {

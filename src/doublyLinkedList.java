@@ -60,18 +60,21 @@ public class doublyLinkedList<T> {
      * @param e Element to insert
      */
     public void insert(T e) {
-        Node newNode = new Node(curr.element);
-        newNode.previous = curr;
+        Node newNode = new Node(e);
+        
         newNode.next = curr.next;
+        curr.next = newNode;
+        newNode.previous = curr;
+        
         if (curr != tail) {
             newNode.next.previous = newNode;
         }
         else {
             tail = newNode;
         }
-        curr.element = e;
-        curr.next = newNode;
         length++;
+        //Set to next value
+        curr = newNode;
     }
 
     /**
