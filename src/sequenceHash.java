@@ -6,9 +6,10 @@
  * @author Josh
  *
  */
-public class hash {
-    //Define the hash function based on sfold
-    private long sfold(String s, int M) {
+public class sequenceHash implements hashTable {
+
+    @Override
+    public long hash(String s, int M) {
         int intLength = s.length() / 4;
         long sum = 0;
         for (int j = 0; j < intLength; j++) {
@@ -29,5 +30,18 @@ public class hash {
 
         sum = (sum * sum) >> 8;
         return(Math.abs(sum) % M);
-      }
+    }
+
+    @Override
+    public void insert(Object e) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void remove(Object e) {
+        // TODO Auto-generated method stub
+        
+    }
+
 }
