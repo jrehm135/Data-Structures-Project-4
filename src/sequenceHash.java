@@ -10,14 +10,14 @@ import java.io.RandomAccessFile;
  *
  */
 public class sequenceHash<T extends memHandle> implements hashTable<memHandle> {
-    private int[] tableArray;
+    private memHandle[] tableArray;
     private int tableSize;
     private RandomAccessFile file;
     
     private final int BUCKETSIZE = 32;
     
     sequenceHash(int tableSize) throws FileNotFoundException{
-        tableArray = new int[tableSize];
+        tableArray = new memHandle[tableSize];
         this.tableSize = tableSize;
         
         file = new RandomAccessFile("hashFile.bin", "rw");
@@ -55,28 +55,22 @@ public class sequenceHash<T extends memHandle> implements hashTable<memHandle> {
         int currSlot = (int) hashSlot % 32;
         
         //Try first slot to check for availability
-        if(tableArray[(int)hashSlot] == 0 &&
-                tableArray[(int)hashSlot + 1] == 0) {
-            tableArray[(int)hashSlot] = handle.getMemLoc();
-            tableArray[(int)hashSlot + 1] = handle.getMemLength();
+        if(tableArray[(int)hashSlot] == null) {
+            tableArray[(int)hashSlot] = handle;
+            return;
         }
         //Move to next slot
-        currSlot = (currSlot + 2) % 64;
+        currSlot = (currSlot + 1) % 32;
         
         //Iterate through slots until one is found
         while((bucket * 32) + currSlot != hashSlot) {
-            if(tableArray[(bucket * 32) + currSlot] == 0 &&
-                    tableArray[(bucket * 32) + currSlot + 1] == 0) {
-                
-                tableArray[(bucket * 32) + currSlot] = 
-                        handle.getMemLoc();
-                tableArray[(bucket * 32) + currSlot + 1] = 
-                        handle.getMemLength();
+            if(tableArray[(bucket * 32) + currSlot] == null) {
+                tableArray[(bucket * 32) + currSlot] = handle;
                 break;
             }
             
             //Move to next slot
-            currSlot = (currSlot + 2) % 64;
+            currSlot = (currSlot + 1) % 32;
         }
     }
 
