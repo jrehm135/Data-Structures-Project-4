@@ -16,6 +16,7 @@ public class sequenceHash<T extends memHandle> implements hashTable<memHandle> {
     
     private final int BUCKETSIZE = 32;
     
+    //Open up a hash file and allocate space for memhandles
     sequenceHash(int tableSize) throws FileNotFoundException{
         tableArray = new memHandle[tableSize];
         this.tableSize = tableSize;
@@ -23,7 +24,7 @@ public class sequenceHash<T extends memHandle> implements hashTable<memHandle> {
         file = new RandomAccessFile("hashFile.bin", "rw");
     }
     
-    //This implements the 
+    //This implements the sfold hash function
     @Override
     public long hash(String s, int M) {
         int intLength = s.length() / 4;
@@ -47,9 +48,10 @@ public class sequenceHash<T extends memHandle> implements hashTable<memHandle> {
         sum = (sum * sum) >> 8;
         return(Math.abs(sum) % M);
     }
-
+    
+    //Insert a memory handle into hashtable
     @Override
-    public void insert(String seqID, memHandle handle) {
+    public boolean insert(String seqID, memHandle handle) {
         long hashSlot = hash(seqID, tableSize);
         int bucket = (int) hashSlot / 32;
         int currSlot = (int) hashSlot % 32;
@@ -57,7 +59,7 @@ public class sequenceHash<T extends memHandle> implements hashTable<memHandle> {
         //Try first slot to check for availability
         if(tableArray[(int)hashSlot] == null) {
             tableArray[(int)hashSlot] = handle;
-            return;
+            return true;
         }
         //Move to next slot
         currSlot = (currSlot + 1) % 32;
@@ -66,12 +68,15 @@ public class sequenceHash<T extends memHandle> implements hashTable<memHandle> {
         while((bucket * 32) + currSlot != hashSlot) {
             if(tableArray[(bucket * 32) + currSlot] == null) {
                 tableArray[(bucket * 32) + currSlot] = handle;
-                break;
+                return true;
             }
             
             //Move to next slot
             currSlot = (currSlot + 1) % 32;
         }
+        
+        //If we make it here, then the bucket is full, reject insert
+        return false;
     }
 
     @Override
