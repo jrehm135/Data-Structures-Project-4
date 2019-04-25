@@ -24,12 +24,11 @@ public class memoryMan {
     }
 
 
-    public memHandle insertSequence(String inputSequence) throws IOException{
+    public memHandle insertSequence(String inputSequence) throws IOException {
         sequence newInsert = new sequence(inputSequence);
-        int seqLength = (int) Math.ceil(newInsert.getLength()/4.0);
+        int seqLength = (int)Math.ceil(newInsert.getLength() / 4.0);
         int insertLoc = getNextMemPosition(seqLength);
-        if(insertLoc + seqLength > currMemSize)
-        {
+        if (insertLoc + seqLength > currMemSize) {
             growMemSize(initMemSize);
         }
         biofile.seek(insertLoc);
@@ -37,18 +36,19 @@ public class memoryMan {
         return new memHandle(insertLoc, seqLength);
     }
 
+
     public memHandle insertID(String inputID) throws IOException {
         sequence newID = new sequence(inputID);
-        int seqLength = (int) Math.ceil(newID.getLength()/4.0);
+        int seqLength = (int)Math.ceil(newID.getLength() / 4.0);
         int insertLoc = getNextMemPosition(seqLength);
-        if(insertLoc + seqLength > currMemSize)
-        {
+        if (insertLoc + seqLength > currMemSize) {
             growMemSize(initMemSize);
         }
         biofile.seek(insertLoc);
         biofile.write(newID.getBytes());
         return new memHandle(insertLoc, seqLength);
     }
+
 
     public void remove(memHandle handle) {
         int offset = handle.getMemLoc();
@@ -67,12 +67,34 @@ public class memoryMan {
             }
             else {
                 freeBlocks.insert(new freeBlock(offset, length));
+                mergeBlocks();
                 return;
             }
         }
         // At this point, we have made it to the end of the list,
         // so we add a freeblock to the end
         freeBlocks.insert(new freeBlock(offset, length));
+    }
+
+
+    public void mergeBlocks() {
+        freeBlocks.moveToHead();
+        freeBlocks.next();
+        while (freeBlocks.hasNext()) {
+            int firstLength = freeBlocks.getElement().getLength();
+            int firstPos = freeBlocks.getElement().getPos();
+            freeBlocks.next();
+            int nextStart = freeBlocks.getElement().getPos();
+            int nextLength = freeBlocks.getElement().getLength();
+
+            if (firstPos + firstLength == nextStart) {
+                freeBlocks.getElement().setBlock(firstPos, nextLength
+                    + firstLength);
+                freeBlocks.previous();
+                freeBlocks.remove();
+            }
+            freeBlocks.next();
+        }
     }
 
 
