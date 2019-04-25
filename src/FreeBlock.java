@@ -6,11 +6,11 @@
  * @author Josh
  *
  */
-public class freeBlock{
+public class FreeBlock{
     private int pos;
     private int length;
 
-    freeBlock(int pos, int length){
+    FreeBlock(int pos, int length){
         this.pos = pos;
         this.length = length;
     }
@@ -28,7 +28,7 @@ public class freeBlock{
         this.length = length;
     }
     
-    public boolean isAdjacent(freeBlock otherBlock) {
+    public boolean isAdjacent(FreeBlock otherBlock) {
         int otherPos = otherBlock.getPos();
         if(this.pos < otherPos) {
             return (this.pos + this.length) == otherPos;

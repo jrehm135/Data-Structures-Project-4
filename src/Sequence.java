@@ -6,11 +6,11 @@
  * @author Josh
  *
  */
-public class sequence {
+public class Sequence {
     private int seqLength;
     private byte seqArray[];
     
-    sequence(String inString){
+    Sequence(String inString){
         //Allocate bytes for the sequence
         seqArray = new byte[(int) Math.ceil(inString.length() / 4.0)];
         seqLength = inString.length();

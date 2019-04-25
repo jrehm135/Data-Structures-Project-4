@@ -6,7 +6,7 @@
  * @author Josh
  *
  */
-public class doublyLinkedList<T> {
+public class DoublyLinkedList<T> {
 
     //Node class for doubly linked list
     private class Node {
@@ -35,7 +35,7 @@ public class doublyLinkedList<T> {
     /**
      * Constructor for list
      */
-    public doublyLinkedList() {
+    public DoublyLinkedList() {
         length = 0;
         head = new Node(null);
         tail = new Node(null);

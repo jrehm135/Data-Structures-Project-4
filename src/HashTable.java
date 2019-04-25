@@ -6,7 +6,7 @@
  * @author Josh
  *
  */
-public interface hashTable<T> {
+public interface HashTable<T> {
     //Define the string hash function
     long hash(String s, int M);
     

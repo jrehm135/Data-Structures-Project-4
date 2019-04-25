@@ -6,12 +6,12 @@
  * @author Josh
  *
  */
-public class memHandle {
+public class MemHandle {
     private int memLoc;
     private int memLength;
     
     
-    memHandle(int loc, int length){
+    MemHandle(int loc, int length){
         this.memLoc = loc;
         this.memLength = length;
     }
