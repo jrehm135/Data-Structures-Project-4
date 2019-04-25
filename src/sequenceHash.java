@@ -17,10 +17,11 @@ public class sequenceHash<T extends memHandle> implements hashTable<memHandle> {
     private final int BUCKETSIZE = 32;
     
     //Open up a hash file and allocate space for memhandles
-    sequenceHash(int tableSize, String hashFile) throws FileNotFoundException{
+    sequenceHash(int tableSize) throws FileNotFoundException{
         tableArray = new memHandle[tableSize];
         this.tableSize = tableSize;
-        file = new RandomAccessFile(hashFile, "rw");
+        
+        file = new RandomAccessFile("hashFile.bin", "rw");
     }
     
     //This implements the sfold hash function
