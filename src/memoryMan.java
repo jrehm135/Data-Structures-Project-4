@@ -215,4 +215,8 @@ public class memoryMan {
         System.out.println("Memory size expanded to " + currMemSize + " size.");
     }
 
+
+    public int getCurMemSize() {
+        return currMemSize;
+    }
 }
