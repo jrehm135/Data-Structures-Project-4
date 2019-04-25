@@ -9,7 +9,7 @@ import java.io.RandomAccessFile;
  *         sequence IDs into the memory file.
  */
 public class MemoryMan {
-    private DoublyLinkedList<FreeBlock> FreeBlocks;
+    private DoublyLinkedList<FreeBlock> freeBlocks;
     private int currMemSize;
     private int initMemSize;
     private RandomAccessFile biofile;
@@ -29,11 +29,11 @@ public class MemoryMan {
     MemoryMan(int memSize, String memoryFile) throws IOException {
         currMemSize = memSize;
         biofile = new RandomAccessFile(memoryFile, "rw");
-        FreeBlocks = new DoublyLinkedList<FreeBlock>();
+        freeBlocks = new DoublyLinkedList<FreeBlock>();
         initMemSize = memSize;
         // Only allocate if greater than 0
         if (memSize > 0) {
-            FreeBlocks.insert(new FreeBlock(0, memSize));
+            freeBlocks.insert(new FreeBlock(0, memSize));
         }
     }
 
@@ -82,6 +82,7 @@ public class MemoryMan {
         }
         biofile.seek(insertLoc);
         biofile.write(newID.getBytes());
+        updateBlockList(insertLoc, seqLength);
         return new MemHandle(insertLoc, seqLength);
     }
 
@@ -104,6 +105,7 @@ public class MemoryMan {
         }
         biofile.seek(insertLoc);
         biofile.write(newInsert.getBytes());
+        updateBlockList(insertLoc, seqLength);
         return new MemHandle(insertLoc, seqLength);
     }
 
@@ -120,24 +122,24 @@ public class MemoryMan {
 
         // Don't actually need to zero out sequence, just
         // add a free block where it was
-        FreeBlock cur = FreeBlocks.getElement();
+        FreeBlock cur = freeBlocks.getElement();
         if (cur == null) {
-            FreeBlocks.insert(new FreeBlock(offset, length));
+            freeBlocks.insert(new FreeBlock(offset, length));
             return;
         }
-        while (FreeBlocks.hasNext()) {
+        while (freeBlocks.hasNext()) {
             if (cur.getPos() < offset) {
-                FreeBlocks.next();
+                freeBlocks.next();
             }
             else {
-                FreeBlocks.insert(new FreeBlock(offset, length));
+                freeBlocks.insert(new FreeBlock(offset, length));
                 mergeBlocks();
                 return;
             }
         }
         // At this point, we have made it to the end of the list,
         // so we add a FreeBlock to the end
-        FreeBlocks.insert(new FreeBlock(offset, length));
+        freeBlocks.insert(new FreeBlock(offset, length));
     }
 
 
@@ -146,22 +148,22 @@ public class MemoryMan {
      * be merged together and merge them if needed.
      */
     public void mergeBlocks() {
-        FreeBlocks.moveToHead();
-        FreeBlocks.next();
-        while (FreeBlocks.hasNext()) {
-            int firstLength = FreeBlocks.getElement().getLength();
-            int firstPos = FreeBlocks.getElement().getPos();
-            FreeBlocks.next();
-            int nextStart = FreeBlocks.getElement().getPos();
-            int nextLength = FreeBlocks.getElement().getLength();
+        freeBlocks.moveToHead();
+        freeBlocks.next();
+        while (freeBlocks.hasNext()) {
+            int firstLength = freeBlocks.getElement().getLength();
+            int firstPos = freeBlocks.getElement().getPos();
+            freeBlocks.next();
+            int nextStart = freeBlocks.getElement().getPos();
+            int nextLength = freeBlocks.getElement().getLength();
 
             if (firstPos + firstLength == nextStart) {
-                FreeBlocks.getElement().setBlock(firstPos, nextLength
+                freeBlocks.getElement().setBlock(firstPos, nextLength
                     + firstLength);
-                FreeBlocks.previous();
-                FreeBlocks.remove();
+                freeBlocks.previous();
+                freeBlocks.remove();
             }
-            FreeBlocks.next();
+            freeBlocks.next();
         }
     }
 
@@ -175,12 +177,12 @@ public class MemoryMan {
      * @return the position where the thing can be inserted.
      */
     private int getNextMemPosition(int lengthNeeded) {
-        FreeBlock cur = FreeBlocks.getElement();
+        FreeBlock cur = freeBlocks.getElement();
         // Make sure to return the memsize if the value is null
         if (cur == null) {
             return currMemSize;
         }
-        while (FreeBlocks.hasNext()) {
+        while (freeBlocks.hasNext()) {
             if (cur.getLength() > lengthNeeded) {
                 // Add to position to reflect taken memory
                 int newPos = cur.getPos() + lengthNeeded;
@@ -191,13 +193,28 @@ public class MemoryMan {
             }
             else if (cur.getLength() == lengthNeeded) {
                 // If the blocks are equal, simply remove
-                FreeBlocks.remove();
+                freeBlocks.remove();
                 break;
             }
-            FreeBlocks.next();
-            cur = FreeBlocks.getElement();
+            freeBlocks.next();
+            cur = freeBlocks.getElement();
         }
         return cur.getPos();
+    }
+
+
+    private void updateBlockList(int location, int length) {
+        freeBlocks.moveToHead();
+        do {
+            freeBlocks.next();
+            FreeBlock cur = freeBlocks.getElement();
+            if (cur.getPos() == location) {
+                freeBlocks.setElement(new FreeBlock(cur.getPos() + length, 
+                    cur.getLength() - length));
+                return;
+            }
+        }
+        while (freeBlocks.hasNext());
     }
 
 
@@ -209,7 +226,7 @@ public class MemoryMan {
      */
     private void growMemSize(int length) {
         // We aren't making new free blocks, just allocate at memory size
-        // FreeBlocks.insert(new FreeBlock(currMemSize, length));
+        // freeBlocks.insert(new FreeBlock(currMemSize, length));
 
         currMemSize += length;
         System.out.println("Memory size expanded to " + currMemSize + " size.");
@@ -218,5 +235,10 @@ public class MemoryMan {
 
     public int getCurMemSize() {
         return currMemSize;
+    }
+
+
+    public DoublyLinkedList<FreeBlock> getfreeBlocksList() {
+        return freeBlocks;
     }
 }
