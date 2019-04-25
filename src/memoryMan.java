@@ -3,7 +3,10 @@ import java.io.RandomAccessFile;
 
 /**
  * @author Josh
+ * @author Quinton Miller
  *
+ *         This is the memory manager that handles inserting sequences and
+ *         sequence IDs into the memory file.
  */
 public class memoryMan {
     private doublyLinkedList<freeBlock> freeBlocks;
@@ -12,6 +15,17 @@ public class memoryMan {
     private RandomAccessFile biofile;
 
 
+    /**
+     * This is the manager that will insert sequences and IDs into the memory
+     * file.
+     * 
+     * @param memSize
+     *            Initial size of the memory.
+     * @param memoryFile
+     *            File to store sequences and ID's in.
+     * @throws IOException
+     *             Throws when the emoryFile can't be found.
+     */
     memoryMan(int memSize, String memoryFile) throws IOException {
         currMemSize = memSize;
         biofile = new RandomAccessFile(memoryFile, "rw");
@@ -24,19 +38,41 @@ public class memoryMan {
     }
 
 
-    public memHandle insertSequence(String inputSequence) throws IOException {
-        sequence newInsert = new sequence(inputSequence);
-        int seqLength = (int)Math.ceil(newInsert.getLength() / 4.0);
-        int insertLoc = getNextMemPosition(seqLength);
-        if (insertLoc + seqLength > currMemSize) {
-            growMemSize(initMemSize);
+    /**
+     * 
+     * @param inputSequenceID
+     *            sequence ID to be inserted.
+     * @param inputSequence
+     *            DNA sequence to be inserted.
+     * @return array of memory locations, the 0 index is the sequence ID
+     *         and the 1 index is the sequence. Returns an empty array if there
+     *         was in IOException
+     * @throws IOException
+     */
+    public memHandle[] insert(String inputSequenceID, String inputSequence) {
+        memHandle insertLocations[] = new memHandle[2];
+        try {
+            insertLocations[0] = insertID(inputSequenceID);
+            insertLocations[1] = insertSequence(inputSequence);
+            return insertLocations;
         }
-        biofile.seek(insertLoc);
-        biofile.write(newInsert.getBytes());
-        return new memHandle(insertLoc, seqLength);
+        catch (Exception IOException) {
+            System.out.println(
+                "Trying to insert into an invalid memory location.");
+            return insertLocations;
+        }
     }
 
 
+    /**
+     * Insert a sequence ID into the memory file.
+     * 
+     * @param inputID
+     *            Sequence ID to be inserted.
+     * @return Memory handle of the sequence ID.
+     * @throws IOException
+     *             Throws when trying to write to invalid memory location.
+     */
     public memHandle insertID(String inputID) throws IOException {
         sequence newID = new sequence(inputID);
         int seqLength = (int)Math.ceil(newID.getLength() / 4.0);
@@ -50,6 +86,34 @@ public class memoryMan {
     }
 
 
+    /**
+     * Insert a sequence into the memory file.
+     * 
+     * @param inputSequence
+     *            Sequence to be inserted.
+     * @return Memory handle of sequence.
+     * @throws IOException
+     *             Throws when trying to write to invalid memory location.
+     */
+    public memHandle insertSequence(String inputSequence) throws IOException {
+        sequence newInsert = new sequence(inputSequence);
+        int seqLength = (int)Math.ceil(newInsert.getLength() / 4.0);
+        int insertLoc = getNextMemPosition(seqLength);
+        if (insertLoc + seqLength > currMemSize) {
+            growMemSize(initMemSize);
+        }
+        biofile.seek(insertLoc);
+        biofile.write(newInsert.getBytes());
+        return new memHandle(insertLoc, seqLength);
+    }
+
+
+    /**
+     * Removes something from the memory file given by the input handle
+     * 
+     * @param handle
+     *            handle of the thing to be removed.
+     */
     public void remove(memHandle handle) {
         int offset = handle.getMemLoc();
         int length = handle.getMemLength();
@@ -77,6 +141,10 @@ public class memoryMan {
     }
 
 
+    /**
+     * Iterate through the free blocks list and look for any blocks that need to
+     * be merged together and merge them if needed.
+     */
     public void mergeBlocks() {
         freeBlocks.moveToHead();
         freeBlocks.next();
@@ -98,6 +166,14 @@ public class memoryMan {
     }
 
 
+    /**
+     * Get the location of the next free block that we can insert into for the
+     * given length.
+     * 
+     * @param lengthNeeded
+     *            Amount of memory needed to insert into the file.
+     * @return the position where the thing can be inserted.
+     */
     private int getNextMemPosition(int lengthNeeded) {
         freeBlock cur = freeBlocks.getElement();
         // Make sure to return the memsize if the value is null
@@ -125,6 +201,12 @@ public class memoryMan {
     }
 
 
+    /**
+     * Expand the size of the memory
+     * 
+     * @param length
+     *            How much we want the memory size to expand by.
+     */
     private void growMemSize(int length) {
         // We aren't making new free blocks, just allocate at memory size
         // freeBlocks.insert(new freeBlock(currMemSize, length));
