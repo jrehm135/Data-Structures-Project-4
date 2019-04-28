@@ -76,6 +76,31 @@ public class DoublyLinkedList<T> {
         //Set to next value
         curr = newNode;
     }
+    
+    /**
+     * insert element after the current curr node, and
+     * sets the curr pointer to itself
+     * 
+     * @param e Element to insert
+     */
+    public void insertBefore(T e) {
+        Node newNode = new Node(e);
+        
+        newNode.previous = curr.previous;
+        curr.previous = newNode;
+        newNode.next = curr;
+        
+        if(curr != head) {
+            newNode.previous.next = newNode;
+        }
+        else {
+            head = newNode;
+        }
+        
+        length++;
+        //Set to next value
+        curr = newNode;
+    }
 
     /**
      * remove the element at curr

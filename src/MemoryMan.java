@@ -116,30 +116,40 @@ public class MemoryMan {
      * @param handle
      *            handle of the thing to be removed.
      */
-    public void remove(MemHandle handle) {
-        int offset = handle.getMemLoc();
-        int length = handle.getMemLength();
-
-        // Don't actually need to zero out sequence, just
-        // add a free block where it was
-        FreeBlock cur = freeBlocks.getElement();
-        if (cur == null) {
-            freeBlocks.insert(new FreeBlock(offset, length));
-            return;
-        }
-        while (freeBlocks.hasNext()) {
-            if (cur.getPos() < offset) {
-                freeBlocks.next();
+    public void remove(MemHandle[] handles) {
+        //Type of handle doesn't matter, we just grab each and free memory
+        for (MemHandle handle:handles) {
+            int offset = handle.getMemLoc();
+            int length = handle.getMemLength();
+    
+            // Don't actually need to zero out sequence, just
+            // add a free block where it was
+            FreeBlock cur = freeBlocks.getElement();
+            if (cur == null) {
+                freeBlocks.insert(new FreeBlock(offset, length));
+            }
+            while (freeBlocks.hasNext()) {
+                if (cur.getPos() < offset) {
+                    freeBlocks.next();
+                }
+                else {
+                    freeBlocks.insert(new FreeBlock(offset, length));
+                    mergeBlocks();
+                    break;
+                }
+            }
+            //Before we finish, we need to check against the last value
+            if (cur.getPos() > offset) {
+                //We want to insert before the last value
+                freeBlocks.insertBefore(new FreeBlock(offset, length));
+                mergeBlocks();
             }
             else {
+                // At this point, we have made it to the end of the list,
+                // so we add a FreeBlock to the end
                 freeBlocks.insert(new FreeBlock(offset, length));
-                mergeBlocks();
-                return;
             }
         }
-        // At this point, we have made it to the end of the list,
-        // so we add a FreeBlock to the end
-        freeBlocks.insert(new FreeBlock(offset, length));
     }
 
 
@@ -163,7 +173,9 @@ public class MemoryMan {
                 freeBlocks.previous();
                 freeBlocks.remove();
             }
-            freeBlocks.next();
+            else {
+                freeBlocks.next();
+            }
         }
     }
 
@@ -177,18 +189,16 @@ public class MemoryMan {
      * @return the position where the thing can be inserted.
      */
     private int getNextMemPosition(int lengthNeeded) {
+        freeBlocks.moveToHead();
+        freeBlocks.next();
         FreeBlock cur = freeBlocks.getElement();
         // Make sure to return the memsize if the value is null
         if (cur == null) {
             return currMemSize;
         }
         while (freeBlocks.hasNext()) {
+            //
             if (cur.getLength() > lengthNeeded) {
-                // Add to position to reflect taken memory
-                int newPos = cur.getPos() + lengthNeeded;
-                // Subtract from size to remove free space
-                int newBlockSize = cur.getLength() - lengthNeeded;
-                cur.setBlock(newPos, newBlockSize);
                 break;
             }
             else if (cur.getLength() == lengthNeeded) {

@@ -32,5 +32,29 @@ public class MemoryManTest extends TestCase{
         
         
     }
+    
+    public void testRemove() {
+        try {
+            testMan = new MemoryMan(1000, "bioFile.bin");
+        }
+        catch (Exception IOException) {
+            System.out.println("Could not find memory file.");
+            return;
+        }
+        MemHandle[] handles = testMan.insert("AAAAA", "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT");//2 + 10 = 12
+        testMan.insert("TTTTT", "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT");//2 + 10 = 12
+        
+        testMan.remove(handles);
+        
+        //Test less than block size
+        testMan.insert("CCC", "AAAATTTTCCCCGGGGAA");//1 + 5 = 6
+        //Test equal to block size
+        testMan.insert("TTT", "AAAATTTTCCCCGGGGAA");//1 + 5 = 6
+        
+        DoublyLinkedList <FreeBlock> testList = testMan.getfreeBlocksList();
+        
+        
+        
+    }
 
 }

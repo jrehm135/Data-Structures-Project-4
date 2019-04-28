@@ -56,7 +56,7 @@ public class testSequnce {
             hashTable.insert("CABC", han22);
             hashTable.insert("CABC", han23);
             hashTable.insert("CABC", han24);
-            manager.remove(han);
+            //manager.remove(han);
             manager.insertSequence("GACTAAAA");
         }
         catch (Exception FileNotFoundException) {
