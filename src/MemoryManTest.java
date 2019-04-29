@@ -48,13 +48,23 @@ public class MemoryManTest extends TestCase{
         
         //Test less than block size
         testMan.insert("CCC", "AAAATTTTCCCCGGGGAA");//1 + 5 = 6
+        
+        DoublyLinkedList <FreeBlock> testList = testMan.getfreeBlocksList();
+        testList.moveToHead();
+        testList.next();
+        FreeBlock tempBlock = testList.getElement();
+        assertTrue(tempBlock.getPos() == 6);
+        assertTrue(tempBlock.getLength() == 6);
+        testList.next();
+        tempBlock = testList.getElement();
+        assertTrue(tempBlock.getPos() == 24);
+        assertTrue(tempBlock.getLength() == 976);
+        
         //Test equal to block size
         testMan.insert("TTT", "AAAATTTTCCCCGGGGAA");//1 + 5 = 6
         
-        DoublyLinkedList <FreeBlock> testList = testMan.getfreeBlocksList();
-        
-        
-        
+        testList = testMan.getfreeBlocksList();
+        assertTrue(testList.getLength() == 1);
     }
 
 }

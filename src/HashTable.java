@@ -1,3 +1,5 @@
+import java.io.RandomAccessFile;
+
 /**
  * 
  */
@@ -8,9 +10,9 @@
  */
 public interface HashTable<T> {
     //Define the string hash function
-    long hash(String s, int M);
+    public long hash(String s, int M);
     
-    boolean insert(String seqID, T e);
+    public boolean insert(String seqID, T[] e);
     
-    void remove(String seqID);
+    public boolean remove(String seqID, RandomAccessFile file);
 }

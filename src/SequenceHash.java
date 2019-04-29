@@ -1,4 +1,5 @@
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
@@ -10,15 +11,14 @@ import java.io.RandomAccessFile;
  *
  */
 public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
-    private MemHandle[] tableArray;
+    private MemHandle[][] tableArray;
     private int tableSize;
     private RandomAccessFile file;
     
-    private final int BUCKETSIZE = 32;
-    
     //Open up a hash file and allocate space for MemHandles
     SequenceHash(int tableSize, String hashFile) throws FileNotFoundException{
-        tableArray = new MemHandle[tableSize];
+        //Create a matrix with size tablesize and 2 elements per row
+        tableArray = new MemHandle[tableSize][2];
         this.tableSize = tableSize;
         
         file = new RandomAccessFile(hashFile, "rw");
@@ -51,14 +51,15 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
     
     //Insert a memory handle into hashtable
     @Override
-    public boolean insert(String seqID, MemHandle handle) {
+    public boolean insert(String seqID, MemHandle[] handles) {
         long hashSlot = hash(seqID, tableSize);
         int bucket = (int) hashSlot / 32;
         int currSlot = (int) hashSlot % 32;
         
         //Try first slot to check for availability
-        if(tableArray[(int)hashSlot] == null) {
-            tableArray[(int)hashSlot] = handle;
+        //We only need to check the first value since the values are related
+        if(tableArray[(int)hashSlot][0] == null) {
+            tableArray[(int)hashSlot] = handles;
             return true;
         }
         //Move to next slot
@@ -66,8 +67,8 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
         
         //Iterate through slots until one is found
         while((bucket * 32) + currSlot != hashSlot) {
-            if(tableArray[(bucket * 32) + currSlot] == null) {
-                tableArray[(bucket * 32) + currSlot] = handle;
+            if(tableArray[(bucket * 32) + currSlot][0] == null) {
+                tableArray[(bucket * 32) + currSlot] = handles;
                 return true;
             }
             
@@ -80,8 +81,26 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
     }
 
     @Override
-    public void remove(String seqID) {
+    public boolean remove(String seqID, RandomAccessFile file) throws IOException {
+        long hashSlot = hash(seqID, tableSize);
+        int bucket = (int) hashSlot / 32;
+        int currSlot = (int) hashSlot % 32;
         
+        //Try first slot to check for availability
+        //We only need to check the first value since the values are related
+        if(tableArray[(int)hashSlot][0] == null) {
+            return false;
+        }
+        else {
+            MemHandle idHandle = tableArray[(int)hashSlot][0];
+            int offset = idHandle.getMemLoc();
+            int length = idHandle.getMemLength()();
+            file.seek(offset);
+            file.read(b, 0, );;
+        }
+        //Move to next slot
+        currSlot = (currSlot + 1) % 32;
+        return true;
     }
 
 }
