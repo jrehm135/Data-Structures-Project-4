@@ -17,12 +17,17 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
 
 
     // Open up a hash file and allocate space for MemHandles
-    SequenceHash(int tableSize, String hashFile) throws FileNotFoundException {
-        // Create a matrix with size tablesize and 2 elements per row
-        tableArray = new MemHandle[tableSize][2];
-        this.tableSize = tableSize;
+    SequenceHash(int tableSize, String hashFile) {
+        try {// Create a matrix with size tablesize and 2 elements per row
+            tableArray = new MemHandle[tableSize][2];
+            this.tableSize = tableSize;
 
-        file = new RandomAccessFile(hashFile, "rw");
+            file = new RandomAccessFile(hashFile, "rw");
+        }
+        catch (IOException e) {
+            System.out.println("Error in sequence hash constructor: " + e
+                .toString());
+        }
     }
 
 
@@ -100,8 +105,18 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
             MemHandle idHandle = tableArray[(int)hashSlot][0];
             int offset = idHandle.getMemLoc();
             int length = idHandle.getMemLength();
+            byte[] fromFile = new byte[(int)Math.ceil(idHandle.getMemLength()
+                / 4.0)];
             file.seek(offset);
-            file.read(b, 0);
+            file.read(fromFile, 0, (int)Math.ceil(idHandle.getMemLength()
+                / 4.0));
+            Sequence temp = new Sequence();
+            String idFromFile = temp.bytesToString(fromFile);
+            if (idFromFile.equals(seqID)) {
+                tableArray[(int)hashSlot][0] = null;
+                tableArray[(int)hashSlot][1] = null;
+                return true;
+            }
         }
         // Move to next slot
         currSlot = (currSlot + 1) % 32;
@@ -113,12 +128,11 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
     public boolean search(String seqID, String sequence, RandomAccessFile file)
         throws IOException {
         long hashSlot = hash(seqID, tableSize);
-        int bucket = (int)hashSlot /32;
+        int bucket = (int)hashSlot / 32;
         int currSlot = (int)hashSlot % 32;
-        
-        //look at first slot
-        if(tableArray[(int)hashSlot][0] == null)
-        {
+
+        // look at first slot
+        if (tableArray[(int)hashSlot][0] == null) {
             return false;
         }
         return false;
