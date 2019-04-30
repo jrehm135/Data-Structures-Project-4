@@ -12,7 +12,7 @@ public class MemoryMan {
     private DoublyLinkedList<FreeBlock> freeBlocks;
     private int currMemSize;
     private int initMemSize;
-    private RandomAccessFile biofile;
+    private RandomAccessFile bioFile;
 
 
     /**
@@ -28,7 +28,7 @@ public class MemoryMan {
      */
     MemoryMan(int memSize, String memoryFile) throws IOException {
         currMemSize = memSize;
-        biofile = new RandomAccessFile(memoryFile, "rw");
+        bioFile = new RandomAccessFile(memoryFile, "rw");
         freeBlocks = new DoublyLinkedList<FreeBlock>();
         initMemSize = memSize;
         // Only allocate if greater than 0
@@ -80,8 +80,8 @@ public class MemoryMan {
         if (insertLoc + seqLength > currMemSize) {
             growMemSize(initMemSize);
         }
-        biofile.seek(insertLoc);
-        biofile.write(newID.getBytes());
+        bioFile.seek(insertLoc);
+        bioFile.write(newID.getBytes());
         updateBlockList(insertLoc, seqLength);
         return new MemHandle(insertLoc, seqLength);
     }
@@ -103,8 +103,8 @@ public class MemoryMan {
         if (insertLoc + seqLength > currMemSize) {
             growMemSize(initMemSize);
         }
-        biofile.seek(insertLoc);
-        biofile.write(newInsert.getBytes());
+        bioFile.seek(insertLoc);
+        bioFile.write(newInsert.getBytes());
         updateBlockList(insertLoc, seqLength);
         return new MemHandle(insertLoc, seqLength);
     }
@@ -117,11 +117,11 @@ public class MemoryMan {
      *            handle of the thing to be removed.
      */
     public void remove(MemHandle[] handles) {
-        //Type of handle doesn't matter, we just grab each and free memory
-        for (MemHandle handle:handles) {
+        // Type of handle doesn't matter, we just grab each and free memory
+        for (MemHandle handle : handles) {
             int offset = handle.getMemLoc();
             int length = handle.getMemLength();
-    
+
             // Don't actually need to zero out sequence, just
             // add a free block where it was
             FreeBlock cur = freeBlocks.getElement();
@@ -138,9 +138,9 @@ public class MemoryMan {
                     break;
                 }
             }
-            //Before we finish, we need to check against the last value
+            // Before we finish, we need to check against the last value
             if (cur.getPos() > offset) {
-                //We want to insert before the last value
+                // We want to insert before the last value
                 freeBlocks.insertBefore(new FreeBlock(offset, length));
                 mergeBlocks();
             }
@@ -153,11 +153,38 @@ public class MemoryMan {
     }
 
 
+    public String[] search(MemHandle handle[], String sequence[])
+        throws IOException {
+        Sequence sequenceIDToFind = new Sequence(sequence[0]);
+        byte idByteFromFile[] = new byte[handle[0].getMemLength()];
+        bioFile.seek(handle[0].getMemLoc());
+        bioFile.read(idByteFromFile, 0, handle[0].getMemLength());
+        if (idByteFromFile.equals(sequenceIDToFind.getBytes())) {
+            Sequence sequenceToFind = new Sequence(sequence[1]);
+            byte seqFromFile[] = new byte[handle[1].getMemLength()];
+            bioFile.seek(handle[1].getMemLoc());
+            bioFile.read(seqFromFile, 0, handle[1].getMemLength());
+            if (seqFromFile.equals(sequenceToFind.getBytes())) {
+                String[] output = new String[2];
+                output[0] = sequenceIDToFind.toString();
+                output[1] = sequenceToFind.toString();
+                return output;
+            }
+            else {
+                return new String[0];
+            }
+        }
+        else {
+            return new String[0];
+        }
+    }
+
+
     /**
      * Iterate through the free blocks list and look for any blocks that need to
      * be merged together and merge them if needed.
      */
-    public void mergeBlocks() {
+    private void mergeBlocks() {
         freeBlocks.moveToHead();
         freeBlocks.next();
         while (freeBlocks.hasNext()) {
@@ -219,8 +246,8 @@ public class MemoryMan {
             freeBlocks.next();
             FreeBlock cur = freeBlocks.getElement();
             if (cur.getPos() == location) {
-                freeBlocks.setElement(new FreeBlock(cur.getPos() + length, 
-                    cur.getLength() - length));
+                freeBlocks.setElement(new FreeBlock(cur.getPos() + length, cur
+                    .getLength() - length));
                 return;
             }
         }
