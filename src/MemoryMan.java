@@ -1,8 +1,9 @@
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.Arrays;
 
 /**
- * @author Josh
+ * @author Josh Rehm
  * @author Quinton Miller
  *
  *         This is the memory manager that handles inserting sequences and
@@ -11,7 +12,6 @@ import java.io.RandomAccessFile;
 public class MemoryMan {
     private DoublyLinkedList<FreeBlock> freeBlocks;
     private int currMemSize;
-    private int initMemSize;
     private RandomAccessFile bioFile;
 
 
@@ -26,14 +26,15 @@ public class MemoryMan {
      * @throws IOException
      *             Throws when the emoryFile can't be found.
      */
-    MemoryMan(int memSize, String memoryFile) throws IOException {
-        currMemSize = memSize;
-        bioFile = new RandomAccessFile(memoryFile, "rw");
-        freeBlocks = new DoublyLinkedList<FreeBlock>();
-        initMemSize = memSize;
-        // Only allocate if greater than 0
-        if (memSize > 0) {
-            freeBlocks.insert(new FreeBlock(0, memSize));
+    MemoryMan(String memoryFile) {
+        try {
+            currMemSize = 0;
+            freeBlocks = new DoublyLinkedList<FreeBlock>();
+            bioFile = new RandomAccessFile(memoryFile, "rw");
+            // Only allocate if greater than 0
+        }
+        catch (IOException e) {
+            System.out.println("Error in memory manager constructor: " + e.toString());
         }
     }
 
@@ -78,7 +79,7 @@ public class MemoryMan {
         int seqLength = (int)Math.ceil(newID.getLength() / 4.0);
         int insertLoc = getNextMemPosition(seqLength);
         if (insertLoc + seqLength > currMemSize) {
-            growMemSize(initMemSize);
+            growMemSize(seqLength);
         }
         bioFile.seek(insertLoc);
         bioFile.write(newID.getBytes());
@@ -101,7 +102,7 @@ public class MemoryMan {
         int seqLength = (int)Math.ceil(newInsert.getLength() / 4.0);
         int insertLoc = getNextMemPosition(seqLength);
         if (insertLoc + seqLength > currMemSize) {
-            growMemSize(initMemSize);
+            growMemSize(seqLength);
         }
         bioFile.seek(insertLoc);
         bioFile.write(newInsert.getBytes());
@@ -177,6 +178,24 @@ public class MemoryMan {
         else {
             return new String[0];
         }
+    }
+
+
+    public String[] print(MemHandle[] handles) throws IOException {
+        String[] outputIDs = new String[handles.length];
+        int i = 0;
+        for (MemHandle m : handles) {
+            byte seqFromFile[] = new byte[(int)Math.ceil(m.getMemLength()
+                / 4.0)];
+            bioFile.seek(m.getMemLoc());
+            bioFile.read(seqFromFile, 0, (int)Math.ceil(m.getMemLength()
+                / 4.0));
+            Sequence fromFile = new Sequence();
+            String stringFromFile = fromFile.bytesToString(seqFromFile);
+            outputIDs[i] = stringFromFile;
+            i++;
+        }
+        return outputIDs;
     }
 
 
