@@ -7,6 +7,7 @@ public class DNAdbase {
     private static String hashFile;
     private static int tableSize;
     private static SequenceHash<MemHandle> hashTable;
+    private static MemoryMan memManager;
 
 
     public static void main(String args[]) {
@@ -21,6 +22,7 @@ public class DNAdbase {
         try {
             Scanner sc = new Scanner(new File(fileName));
             hashTable = new SequenceHash<MemHandle>(tableSize, hashFile);
+            memManager = new MemoryMan(memFile);
             while(sc.hasNextLine())
             {
                 String command = sc.next();
@@ -30,7 +32,7 @@ public class DNAdbase {
                         String seqID = sc.next();
                         int seqLength = Integer.parseInt(sc.next());
                         String sequence = sc.nextLine();
-                       // hashTable.insert(seqID, handles);
+                       //z hashTable.insert(seqID, handles);
                         break;
                 }
             }
