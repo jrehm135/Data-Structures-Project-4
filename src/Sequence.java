@@ -40,6 +40,11 @@ public class Sequence {
         }
     }
     
+
+    Sequence(){
+        
+    }
+    
     public int getLength() {
         return this.seqLength;
     }
@@ -47,6 +52,34 @@ public class Sequence {
     public byte[] getBytes() {
         return this.seqArray;
     }
+    
+    public String bytesToString(byte[] input) {
+        StringBuilder buildString = new StringBuilder();
+        for(int i = 0; i < input.length * 4; i++) {
+            //Begin at the start of byte minus 2, then subtract
+            // the number of bits into the byte we are
+            int bytePos = 6 - (i % 4) * 2;
+            //Only need 2 bits, so and with 3
+            int currChar = 0x3 & input[i/4] >> bytePos;
+            
+            if(currChar == 0) {
+                buildString.append('A');
+            }
+            else if(currChar == 1) {
+                buildString.append('C');
+            }
+            else if(currChar == 2) {
+                buildString.append('G');
+            }
+            else if(currChar == 3) {
+                buildString.append('T');
+            }
+        }
+        
+        String seqString = buildString.toString();
+        return seqString;
+    }
+        
     
     @Override
     public String toString() {
