@@ -6,7 +6,7 @@ public class MemoryManTest extends TestCase{
 
     public void testInit() {
         try {
-            testMan = new MemoryMan(1000, "bioFile.bin");
+            testMan = new MemoryMan("bioFile.bin");
             assertTrue(testMan.getCurMemSize() == 1000);
         }
         catch (Exception IOException) {
@@ -16,26 +16,24 @@ public class MemoryManTest extends TestCase{
     
     public void testInsert() {
         try {
-            testMan = new MemoryMan(1000, "bioFile.bin");
+            testMan = new MemoryMan("bioFile.bin");
         }
         catch (Exception IOException) {
             System.out.println("Could not find memory file.");
             return;
         }
-        testMan.insert("AAAAA", "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT");//2 + 10 = 12
+        MemHandle[] han = testMan.insert("AAAAA", "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT");//2 + 10 = 12
         DoublyLinkedList <FreeBlock> testList = testMan.getfreeBlocksList();
-        testList.moveToHead();
-        testList.next();
-        FreeBlock tempBlock = testList.getElement();
-        assertTrue(tempBlock.getPos() == 12);
-        assertTrue(tempBlock.getLength() == 988);
-        
-        
+        assertEquals(testList.getLength(), 0);
+        assertEquals(han[0].getMemLength(), 5);
+        assertEquals(han[0].getMemLoc(), 0);
+        assertEquals(han[1].getMemLength(), 40);
+        assertEquals(han[1].getMemLoc(), 2);
     }
     
     public void testRemove() {
         try {
-            testMan = new MemoryMan(1000, "bioFile.bin");
+            testMan = new MemoryMan("bioFile.bin");
         }
         catch (Exception IOException) {
             System.out.println("Could not find memory file.");
@@ -53,18 +51,15 @@ public class MemoryManTest extends TestCase{
         testList.moveToHead();
         testList.next();
         FreeBlock tempBlock = testList.getElement();
-        assertTrue(tempBlock.getPos() == 6);
-        assertTrue(tempBlock.getLength() == 6);
+        assertEquals(tempBlock.getPos(), 6);
+        assertEquals(tempBlock.getLength(), 6);
         testList.next();
-        tempBlock = testList.getElement();
-        assertTrue(tempBlock.getPos() == 24);
-        assertTrue(tempBlock.getLength() == 976);
         
         //Test equal to block size
         testMan.insert("TTT", "AAAATTTTCCCCGGGGAA");//1 + 5 = 6
         
         testList = testMan.getfreeBlocksList();
-        assertTrue(testList.getLength() == 1);
+        assertTrue(testList.getLength() == 0);
     }
 
 }

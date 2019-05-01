@@ -6,7 +6,7 @@ public class testSequnce {
         
         try {
             SequenceHash<MemHandle> hashTable = new SequenceHash<MemHandle>(100,"hashFile.bin");
-            MemoryMan manager = new MemoryMan(0, "biofile.bin");
+            MemoryMan manager = new MemoryMan("biofile.bin");
             manager.insertSequence("GACTAAAA");
         }
         catch (Exception FileNotFoundException) {

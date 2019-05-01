@@ -67,7 +67,10 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
         // Try first slot to check for availability
         // We only need to check the first value since the values are related
         if (tableArray[(int)hashSlot][0] == null) {
-            tableArray[(int)hashSlot] = handles;
+            //Need to initialize a different array to store
+            MemHandle[] hashHandle = new MemHandle[2];
+            System.arraycopy(handles, 0, hashHandle, 0, 2);
+            tableArray[(int)hashSlot] = hashHandle;
             return true;
         }
         // Move to next slot
@@ -76,7 +79,10 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
         // Iterate through slots until one is found
         while ((bucket * 32) + currSlot != hashSlot) {
             if (tableArray[(bucket * 32) + currSlot][0] == null) {
-                tableArray[(bucket * 32) + currSlot] = handles;
+                //Need to initialize a different array to store
+                MemHandle[] hashHandle = new MemHandle[2];
+                System.arraycopy(handles, 0, hashHandle, 0, 2);
+                tableArray[(bucket * 32) + currSlot] = hashHandle;
                 return true;
             }
 
@@ -98,29 +104,35 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
 
         // Try first slot to check for availability
         // We only need to check the first value since the values are related
-        if (tableArray[(int)hashSlot][0] == null) {
+        if (tableArray[(bucket * 32) + currSlot][0] == null) {
             return false;
         }
-        else {
-            MemHandle idHandle = tableArray[(int)hashSlot][0];
+        do {
+            MemHandle idHandle = tableArray[(bucket * 32) + currSlot][0];
             int offset = idHandle.getMemLoc();
             int length = idHandle.getMemLength();
             byte[] fromFile = new byte[(int)Math.ceil(idHandle.getMemLength()
                 / 4.0)];
+            //Read from file location for comparison
             file.seek(offset);
             file.read(fromFile, 0, (int)Math.ceil(idHandle.getMemLength()
                 / 4.0));
+            //Convert to a sequence to compare
             Sequence temp = new Sequence();
-            String idFromFile = temp.bytesToString(fromFile);
-            if (idFromFile.equals(seqID)) {
-                tableArray[(int)hashSlot][0] = null;
-                tableArray[(int)hashSlot][1] = null;
+            String fullBytes = temp.bytesToString(fromFile);
+            //We must then shorten the string to the proper length
+            String fileID = fullBytes.substring(0, length);
+            if (fileID.equals(seqID)) {
+                tableArray[(bucket * 32) + currSlot][0] = null;
+                tableArray[(bucket * 32) + currSlot][1] = null;
                 return true;
             }
+            // Move to next slot
+            currSlot = (currSlot + 1) % 32;
         }
-        // Move to next slot
-        currSlot = (currSlot + 1) % 32;
-        return true;
+        while((bucket * 32) + currSlot != hashSlot);
+        //The sequence id was not found in any slot
+        return false;
     }
 
 
@@ -136,6 +148,15 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
             return false;
         }
         return false;
+    }
+    
+    @Override
+    public MemHandle[] getHandles(int location) {
+        return tableArray[location];
+    }
+    
+    public void testSetter(int location, MemHandle[] hans) {
+        tableArray[location] = hans;
     }
 
 }

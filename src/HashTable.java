@@ -23,4 +23,6 @@ public interface HashTable<T> {
 
     public boolean search(String seqID, String sequence, RandomAccessFile file)
         throws IOException;
+    
+    public T[] getHandles(int location);
 }

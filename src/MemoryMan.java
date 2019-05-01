@@ -84,7 +84,7 @@ public class MemoryMan {
         bioFile.seek(insertLoc);
         bioFile.write(newID.getBytes());
         updateBlockList(insertLoc, seqLength);
-        return new MemHandle(insertLoc, seqLength);
+        return new MemHandle(insertLoc, newID.getLength());
     }
 
 
@@ -107,7 +107,7 @@ public class MemoryMan {
         bioFile.seek(insertLoc);
         bioFile.write(newInsert.getBytes());
         updateBlockList(insertLoc, seqLength);
-        return new MemHandle(insertLoc, seqLength);
+        return new MemHandle(insertLoc, newInsert.getLength());
     }
 
 
@@ -121,13 +121,14 @@ public class MemoryMan {
         // Type of handle doesn't matter, we just grab each and free memory
         for (MemHandle handle : handles) {
             int offset = handle.getMemLoc();
-            int length = handle.getMemLength();
+            int length = (int)Math.ceil(handle.getMemLength() / 4.0);
 
             // Don't actually need to zero out sequence, just
             // add a free block where it was
             FreeBlock cur = freeBlocks.getElement();
             if (cur == null) {
                 freeBlocks.insert(new FreeBlock(offset, length));
+                continue;
             }
             while (freeBlocks.hasNext()) {
                 if (cur.getPos() < offset) {
@@ -149,6 +150,7 @@ public class MemoryMan {
                 // At this point, we have made it to the end of the list,
                 // so we add a FreeBlock to the end
                 freeBlocks.insert(new FreeBlock(offset, length));
+                mergeBlocks();
             }
         }
     }
@@ -157,14 +159,16 @@ public class MemoryMan {
     public String[] search(MemHandle handle[], String sequence[])
         throws IOException {
         Sequence sequenceIDToFind = new Sequence(sequence[0]);
-        byte idByteFromFile[] = new byte[handle[0].getMemLength()];
+        int idLength = (int)Math.ceil(handle[0].getMemLength() / 4.0);
+        int seqLength = (int)Math.ceil(handle[1].getMemLength() / 4.0);
+        byte idByteFromFile[] = new byte[idLength];
         bioFile.seek(handle[0].getMemLoc());
-        bioFile.read(idByteFromFile, 0, handle[0].getMemLength());
+        bioFile.read(idByteFromFile, 0, idLength);
         if (idByteFromFile.equals(sequenceIDToFind.getBytes())) {
             Sequence sequenceToFind = new Sequence(sequence[1]);
-            byte seqFromFile[] = new byte[handle[1].getMemLength()];
+            byte seqFromFile[] = new byte[seqLength];
             bioFile.seek(handle[1].getMemLoc());
-            bioFile.read(seqFromFile, 0, handle[1].getMemLength());
+            bioFile.read(seqFromFile, 0, seqLength);
             if (seqFromFile.equals(sequenceToFind.getBytes())) {
                 String[] output = new String[2];
                 output[0] = sequenceIDToFind.toString();
@@ -260,13 +264,21 @@ public class MemoryMan {
 
 
     private void updateBlockList(int location, int length) {
+        if(freeBlocks.getLength() == 0) {
+            return;
+        }
         freeBlocks.moveToHead();
         do {
             freeBlocks.next();
             FreeBlock cur = freeBlocks.getElement();
             if (cur.getPos() == location) {
-                freeBlocks.setElement(new FreeBlock(cur.getPos() + length, cur
+                if(cur.getLength() == length) {
+                    freeBlocks.remove();
+                }
+                else {
+                    freeBlocks.setElement(new FreeBlock(cur.getPos() + length, cur
                     .getLength() - length));
+                }
                 return;
             }
         }
