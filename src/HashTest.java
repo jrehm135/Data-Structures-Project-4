@@ -57,4 +57,19 @@ public class HashTest extends TestCase {
                 hans);
         hashTable.insert("AAAAA", handles);
     }
+    
+    public void testSearch() throws FileNotFoundException, IOException {
+        try {
+            testMan = new MemoryMan("bioFile.bin");
+            hashTable = new SequenceHash<MemHandle>(1000, "hashFile.bin");
+        }
+        catch (Exception IOException) {
+            System.out.println("Could not find memory file.");
+            return;
+        }
+        MemHandle[] handles = testMan.insert("AAAAA", "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT");//2 + 10 = 12
+        hashTable.insert("AAAAA", handles);
+        String s = hashTable.search("AAAAA", new RandomAccessFile("bioFile.bin", "rw"));
+        assertEquals(s, "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT");
+    }
 }

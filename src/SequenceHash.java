@@ -137,17 +137,53 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
 
 
     @Override
-    public boolean search(String seqID, String sequence, RandomAccessFile file)
+    public String search(String seqID, RandomAccessFile file)
         throws IOException {
         long hashSlot = hash(seqID, tableSize);
         int bucket = (int)hashSlot / 32;
         int currSlot = (int)hashSlot % 32;
 
         // look at first slot
-        if (tableArray[(int)hashSlot][0] == null) {
-            return false;
+        if (tableArray[(bucket * 32) + currSlot][0] == null) {
+            return "";
         }
-        return false;
+        do {
+            MemHandle idHandle = tableArray[(bucket * 32) + currSlot][0];
+            int offset = idHandle.getMemLoc();
+            int length = idHandle.getMemLength();
+            byte[] fromFile = new byte[(int)Math.ceil(idHandle.getMemLength()
+                / 4.0)];
+            //Read from file location for comparison
+            file.seek(offset);
+            file.read(fromFile, 0, (int)Math.ceil(idHandle.getMemLength()
+                / 4.0));
+            //Convert to a sequence to compare
+            Sequence temp = new Sequence();
+            String fullBytes = temp.bytesToString(fromFile);
+            //We must then shorten the string to the proper length
+            String fileID = fullBytes.substring(0, length);
+            if (fileID.equals(seqID)) {
+                MemHandle seqHandle = tableArray[(bucket * 32) + currSlot][1];
+                int seqOffset = seqHandle.getMemLoc();
+                int seqLength = seqHandle.getMemLength();
+                byte[] seqFromFile = new byte[(int)Math.ceil(seqHandle.getMemLength()
+                    / 4.0)];
+                //Read from file location for comparison
+                file.seek(seqOffset);
+                file.read(seqFromFile, 0, (int)Math.ceil(seqHandle.getMemLength()
+                    / 4.0));
+                //Convert to a sequence to compare
+                Sequence tempSeq = new Sequence();
+                String seqFullBytes = tempSeq.bytesToString(seqFromFile);
+                //We must then shorten the string to the proper length
+                String finalSeq = seqFullBytes.substring(0, seqLength);
+                return finalSeq;
+            }
+            // Move to next slot
+            currSlot = (currSlot + 1) % 32;
+        }
+        while((bucket * 32) + currSlot != hashSlot);
+        return "";
     }
     
     @Override
@@ -155,6 +191,7 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
         return tableArray[location];
     }
     
+    //A test method for insert/remove
     public void testSetter(int location, MemHandle[] hans) {
         tableArray[location] = hans;
     }
