@@ -27,8 +27,14 @@ public class HashTest extends TestCase {
         }
         
         MemHandle[] handles = testMan.insert("AAAAA", "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT");//2 + 10 = 12
-        hashTable.insert("AAAAA", handles);
-        hashTable.insert("AAAAA", handles);
+        try {
+            hashTable.insert("AAAAA", handles);
+            hashTable.insert("AAAAA", handles);
+        }
+        catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         
         assertEquals(hashTable.getHandles(
                 (int)hashTable.hash("AAAAA", 1000)),
