@@ -14,6 +14,7 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
     private MemHandle[][] tableArray;
     private int tableSize;
     private RandomAccessFile file;
+    private int currSize;
 
 
     // Open up a hash file and allocate space for MemHandles
@@ -21,6 +22,7 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
         try {// Create a matrix with size tablesize and 2 elements per row
             tableArray = new MemHandle[tableSize][2];
             this.tableSize = tableSize;
+            currSize = 0;
 
             file = new RandomAccessFile(hashFile, "rw");
         }
@@ -74,6 +76,7 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
             MemHandle[] hashHandle = new MemHandle[2];
             System.arraycopy(handles, 0, hashHandle, 0, 2);
             tableArray[(int)hashSlot] = hashHandle;
+            currSize++;
             //Store values in hash file
             file.seek(hashSlot * 16);
             file.write(hashHandle[0].getMemLoc());
@@ -102,6 +105,7 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
                 MemHandle[] hashHandle = new MemHandle[2];
                 System.arraycopy(handles, 0, hashHandle, 0, 2);
                 tableArray[(bucket * 32) + currSlot] = hashHandle;
+                currSize++;
                 //Store values in hash file
                 file.seek(((bucket * 32) + currSlot) * 16);
                 file.write(hashHandle[0].getMemLoc());
@@ -129,6 +133,7 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
             MemHandle[] hashHandle = new MemHandle[2];
             System.arraycopy(handles, 0, hashHandle, 0, 2);
             tableArray[lowestTombstone] = hashHandle;
+            currSize++;
             //Store values in hash file
             file.seek(((bucket * 32) + currSlot) * 16);
             file.write(hashHandle[0].getMemLoc());
@@ -179,6 +184,7 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
             //We must then shorten the string to the proper length
             String fileID = fullBytes.substring(0, length);
             if (fileID.equals(seqID)) {
+                currSize--;
                 //For a tombstone, we use values of -1, impossible length and offset
                 tableArray[(bucket * 32) + currSlot][0] = new MemHandle(-1, -1);
                 tableArray[(bucket * 32) + currSlot][1] = new MemHandle(-1, -1);
@@ -255,6 +261,21 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
     @Override
     public MemHandle[] getHandles(int location) {
         return tableArray[location];
+    }
+    
+    //Get table handles for printing
+    public MemHandle[] getAllHandles() {
+        MemHandle[] handleTable = new MemHandle[currSize];
+        int tablePos = 0;
+        for(MemHandle[] tempHandles: tableArray) {
+            if(tempHandles[0] == null || tempHandles[0].getMemLoc() == -1) {
+                continue;
+            }
+            handleTable[tablePos] = tempHandles[0];
+            tablePos++;
+        }
+            
+        return handleTable;
     }
     
     //A test method for insert/remove
