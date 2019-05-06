@@ -306,7 +306,7 @@ public class MemoryMan {
     }
 
 
-    public DoublyLinkedList<FreeBlock> getfreeBlocksList() {
+    public DoublyLinkedList<FreeBlock> getFreeBlocksList() {
         return freeBlocks;
     }
 }

@@ -50,8 +50,30 @@ public class DNAdbase {
                         break;
                         
                     case "print":
-                        MemHandle[] allHandles = hashTable.getAllHandles();
+                        int[] hashLocs = new int[hashTable.getSize()];
+                        MemHandle[] allHandles = 
+                        hashTable.getAllHandles(hashLocs);
                         String[] sOut = memManager.print(allHandles);
+                        System.out.print("Sequence IDs:");
+                        for(int i = 0; i < hashTable.getSize(); i++) {
+                            System.out.print(sOut[i] + ": hash slot [" + hashLocs[i] + "]");
+                        }
+                        DoublyLinkedList<FreeBlock> freeBlocks
+                        = memManager.getFreeBlocksList();
+                        if(freeBlocks.getLength() == 0) {
+                            System.out.print("Free Block List: none");
+                            break;
+                        }
+                        int blockCount = 0;
+                        while(freeBlocks.hasNext()) {
+                            freeBlocks.next();
+                            blockCount++;
+                            FreeBlock tempBlock = freeBlocks.getElement();
+                            System.out.print("[Block " + blockCount
+                                    + "] Starting Byte Location: " + 
+                                    tempBlock.getPos() + ", Size: " +
+                                    tempBlock.getLength() + "bytes");
+                        }
                         break;
                 }
             }

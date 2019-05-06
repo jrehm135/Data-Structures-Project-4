@@ -264,18 +264,21 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
     }
     
     //Get table handles for printing
-    public MemHandle[] getAllHandles() {
+    public MemHandle[] getAllHandles(int[] tableLocs) {
         MemHandle[] handleTable = new MemHandle[currSize];
-        int tablePos = 0;
-        for(MemHandle[] tempHandles: tableArray) {
-            if(tempHandles[0] == null || tempHandles[0].getMemLoc() == -1) {
+        for(int i = 0; i < tableSize; i++) {
+            if(tableArray[i][0] == null || tableArray[i][0].getMemLoc() == -1) {
                 continue;
             }
-            handleTable[tablePos] = tempHandles[0];
-            tablePos++;
+            handleTable[i] = tableArray[i][0];
+            tableLocs[i] = i;
         }
             
         return handleTable;
+    }
+    
+    public int getSize() {
+        return this.currSize;
     }
     
     //A test method for insert/remove
