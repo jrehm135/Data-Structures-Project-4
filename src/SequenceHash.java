@@ -63,6 +63,9 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
         long hashSlot = hash(seqID, tableSize);
         int bucket = (int)hashSlot / 32;
         int currSlot = (int)hashSlot % 32;
+        
+        int lowestTombstone = -1;
+        boolean tombFound = false;
 
         // Try first slot to check for availability
         // We only need to check the first value since the values are related
@@ -82,14 +85,19 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
             file.write(hashHandle[1].getMemLength());
             return true;
         }
+        //Check for tombstones
+        else if (tableArray[(bucket * 32) + currSlot][0].equals(
+                new MemHandle(-1, -1))) {
+            lowestTombstone = (bucket * 32) + currSlot;
+            tombFound = true;
+        }
         // Move to next slot
         currSlot = (currSlot + 1) % 32;
 
         // Iterate through slots until one is found
+        // Use a for loop to keep track of tombstones
         while ((bucket * 32) + currSlot != hashSlot) {
-            if (tableArray[(bucket * 32) + currSlot][0] == null ||
-                    tableArray[(bucket * 32) + currSlot][0].equals(
-                            new MemHandle(-1, -1))) {
+            if (tableArray[(bucket * 32) + currSlot][0] == null) {
                 //Need to initialize a different array to store
                 MemHandle[] hashHandle = new MemHandle[2];
                 System.arraycopy(handles, 0, hashHandle, 0, 2);
@@ -105,11 +113,33 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
                 file.write(hashHandle[1].getMemLength());
                 return true;
             }
+            //Find first tombstone in sequence
+            else if(tableArray[(bucket * 32) + currSlot][0].equals(
+                    new MemHandle(-1, -1)) && !tombFound) {
+                    lowestTombstone = (bucket * 32) + currSlot;
+                    tombFound = true;
+            }
 
             // Move to next slot
             currSlot = (currSlot + 1) % 32;
         }
-
+        
+        //If a tombstone has an open spot, we can fill it here
+        if(tombFound) {
+            MemHandle[] hashHandle = new MemHandle[2];
+            System.arraycopy(handles, 0, hashHandle, 0, 2);
+            tableArray[lowestTombstone] = hashHandle;
+            //Store values in hash file
+            file.seek(((bucket * 32) + currSlot) * 16);
+            file.write(hashHandle[0].getMemLoc());
+            file.seek(((bucket * 32) + currSlot) * 16 + 4);
+            file.write(hashHandle[0].getMemLength());
+            file.seek(((bucket * 32) + currSlot) * 16 + 8);
+            file.write(hashHandle[1].getMemLoc());
+            file.seek(((bucket * 32) + currSlot) * 16 + 12);
+            file.write(hashHandle[1].getMemLength());
+            return true;
+        }
         // If we make it here, then the bucket is full, reject insert
         return false;
     }
