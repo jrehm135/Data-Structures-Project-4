@@ -132,15 +132,21 @@ public class MemoryMan {
                 freeBlocks.insert(new FreeBlock(offset, length));
                 continue;
             }
+            boolean alreadyInserted = false;
             while (freeBlocks.hasNext()) {
-                if (cur.getPos() < offset) {
+                if (cur.getPos()+cur.getLength() < offset) {
                     freeBlocks.next();
                 }
-                else {
+                else {//we find something that needs to get merged
                     freeBlocks.insert(new FreeBlock(offset, length));
                     mergeBlocks();
+                    alreadyInserted = true;
                     break;
                 }
+            }
+            if(alreadyInserted)
+            {
+                continue;
             }
             // Before we finish, we need to check against the last value
             if (cur.getPos() > offset) {
@@ -157,7 +163,13 @@ public class MemoryMan {
         }
     }
 
-
+    /**
+     * searchs through the memory file for the given sequence
+     * @param handle the places to look for the sequence
+     * @param sequence sequences you are looking for
+     * @return array of strings that the manager has found, empty if nothing is found
+     * @throws IOException throws if there is file access error
+     */
     public String[] search(MemHandle handle[], String sequence[])
         throws IOException {
         Sequence sequenceIDToFind = new Sequence(sequence[0]);
@@ -186,7 +198,12 @@ public class MemoryMan {
         }
     }
 
-
+    /**
+     * searches through the memory file to find things
+     * @param handles where to look for the sequences
+     * @return array of strings that from the handle inputs
+     * @throws IOException throws when there is a file read error
+     */
     public String[] print(MemHandle[] handles) throws IOException {
         String[] outputIDs = new String[handles.length];
         int i = 0;
@@ -319,13 +336,19 @@ public class MemoryMan {
 
         currMemSize += length;    
     }
-
-
+    
+    /**
+     * getter for the current memory size
+     * @return the current memory size;
+     */
     public int getCurMemSize() {
         return currMemSize;
     }
 
-
+    /**
+     * returns the current free block list
+     * @return current free block list
+     */
     public DoublyLinkedList<FreeBlock> getFreeBlocksList() {
         return freeBlocks;
     }
