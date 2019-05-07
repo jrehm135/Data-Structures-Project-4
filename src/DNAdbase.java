@@ -3,6 +3,13 @@ import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
 import java.util.Scanner;
 
+/**
+ * 
+ * @author Yogi
+ * 
+ * THis is the main function for the DNA data base
+ *
+ */
 public class DNAdbase {
     private static String memFile;
     private static String hashFile;
@@ -18,11 +25,14 @@ public class DNAdbase {
         parseFile(args[0]);
     }
 
-
+    /**
+     * parses through the command file and runs the commands
+     * @param fileName name of the command file to parse through
+     */
     private static void parseFile(String fileName) {
         try {
             Scanner sc = new Scanner(new File(fileName));
-            hashTable = new SequenceHash<MemHandle>(tableSize, hashFile);
+            hashTable = new SequenceHash<MemHandle>(tableSize, hashFile); 
             memManager = new MemoryMan(memFile);
             RandomAccessFile seqFile = new RandomAccessFile(memFile, "rw");
             while(sc.hasNextLine())
@@ -81,6 +91,7 @@ public class DNAdbase {
                         }
                         int blockCount = 0;
                         freeBlocks.moveToHead();
+                        System.out.println("Free Block List:");
                         while(freeBlocks.hasNext()) {
                             freeBlocks.next();
                             blockCount++;
