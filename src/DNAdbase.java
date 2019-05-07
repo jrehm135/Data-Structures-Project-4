@@ -42,11 +42,25 @@ public class DNAdbase {
                         seqID = sc.next();
                         handles = hashTable.remove(seqID, seqFile);
                         memManager.remove(handles);
+                        byte[] fromFile = new byte[(int)Math.ceil(handles[1].getMemLength()
+                                / 4.0)];
+                        seqFile.seek(handles[1].getMemLoc());
+                        seqFile.read(fromFile, 0, handles[1].getMemLength());
+                        Sequence seq = new Sequence();
+                        String stringSequence = seq.bytesToString(fromFile);
+                        System.out.print("Sequence Removed: " + seqID);
+                        System.out.print(stringSequence);
                         break;
                         
                     case "search":
                         seqID = sc.next();
                         sequence = hashTable.search(seqID, seqFile);
+                        if(sequence == "") {
+                            System.out.print("SequenceID "+ seqID + " not found");
+                        }
+                        else {
+                            System.out.print("Sequence Found: "+ sequence);
+                        }
                         break;
                         
                     case "print":
@@ -71,8 +85,8 @@ public class DNAdbase {
                             FreeBlock tempBlock = freeBlocks.getElement();
                             System.out.print("[Block " + blockCount
                                     + "] Starting Byte Location: " + 
-                                    tempBlock.getPos() + ", Size: " +
-                                    tempBlock.getLength() + "bytes");
+                                    tempBlock.getPos() + ", Size " +
+                                    tempBlock.getLength() + " bytes");
                         }
                         break;
                 }
