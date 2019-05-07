@@ -196,7 +196,8 @@ public class MemoryMan {
                 / 4.0));
             Sequence fromFile = new Sequence();
             String stringFromFile = fromFile.bytesToString(seqFromFile);
-            outputIDs[i] = stringFromFile;
+            String finalString = stringFromFile.substring(0, m.getMemLength());
+            outputIDs[i] = finalString;
             i++;
         }
         return outputIDs;
@@ -296,8 +297,7 @@ public class MemoryMan {
         // We aren't making new free blocks, just allocate at memory size
         // freeBlocks.insert(new FreeBlock(currMemSize, length));
 
-        currMemSize += length;
-        System.out.println("Memory size expanded to " + currMemSize + " size.");
+        currMemSize += length;    
     }
 
 
