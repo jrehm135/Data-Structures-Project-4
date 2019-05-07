@@ -123,6 +123,8 @@ public class MemoryMan {
             int offset = handle.getMemLoc();
             int length = (int)Math.ceil(handle.getMemLength() / 4.0);
 
+            freeBlocks.moveToHead();
+            freeBlocks.next();
             // Don't actually need to zero out sequence, just
             // add a free block where it was
             FreeBlock cur = freeBlocks.getElement();
@@ -203,6 +205,27 @@ public class MemoryMan {
         return outputIDs;
     }
 
+    private void sortBlocks() {
+        freeBlocks.moveToHead();
+        freeBlocks.next();
+        while (freeBlocks.hasNext()) {
+            int firstLength = freeBlocks.getElement().getLength();
+            int firstPos = freeBlocks.getElement().getPos();
+            freeBlocks.next();
+            int nextStart = freeBlocks.getElement().getPos();
+            int nextLength = freeBlocks.getElement().getLength();
+
+            if (firstPos + firstLength == nextStart) {
+                freeBlocks.getElement().setBlock(firstPos, nextLength
+                    + firstLength);
+                freeBlocks.previous();
+                freeBlocks.remove();
+            }
+            else {
+                freeBlocks.next();
+            }
+        }
+    }
 
     /**
      * Iterate through the free blocks list and look for any blocks that need to
@@ -223,9 +246,6 @@ public class MemoryMan {
                     + firstLength);
                 freeBlocks.previous();
                 freeBlocks.remove();
-            }
-            else {
-                freeBlocks.next();
             }
         }
     }
