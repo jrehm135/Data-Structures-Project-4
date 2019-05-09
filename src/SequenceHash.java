@@ -1,14 +1,13 @@
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
  * 
- */
-
-/**
- * @author Josh
+ * @author Josh Rehm
+ * @author Quinton Miller
  *
+ * @param <T>
+ *            things to stor in the hash table
  */
 public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
     private MemHandle[][] tableArray;
@@ -18,6 +17,14 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
 
 
     // Open up a hash file and allocate space for MemHandles
+    /**
+     * create a new hash table
+     * 
+     * @param tableSize
+     *            size of the table
+     * @param hashFile
+     *            file to store the hashes in
+     */
     SequenceHash(int tableSize, String hashFile) {
         try {// Create a matrix with size tablesize and 2 elements per row
             tableArray = new MemHandle[tableSize][2];
@@ -35,11 +42,11 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
 
     // This implements the sfold hash function
     @Override
-    public long hash(String s, int M) {
+    public long hash(String s, int m) {
         int intLength = s.length() / 4;
         long sum = 0;
         for (int j = 0; j < intLength; j++) {
-            char c[] = s.substring(j * 4, (j * 4) + 4).toCharArray();
+            char[] c = s.substring(j * 4, (j * 4) + 4).toCharArray();
             long mult = 1;
             for (int k = 0; k < c.length; k++) {
                 sum += c[k] * mult;
@@ -47,7 +54,7 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
             }
         }
 
-        char c[] = s.substring(intLength * 4).toCharArray();
+        char[] c = s.substring(intLength * 4).toCharArray();
         long mult = 1;
         for (int k = 0; k < c.length; k++) {
             sum += c[k] * mult;
@@ -55,7 +62,7 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
         }
 
         sum = (sum * sum) >> 8;
-        return (Math.abs(sum) % M);
+        return (Math.abs(sum) % m);
     }
 
 
@@ -273,6 +280,13 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
     }
 
 
+    /**
+     * get all handles at given locations
+     * 
+     * @param tableLocs
+     *            locations to get handles from
+     * @return handles at given locations
+     */
     // Get table handles for printing
     public MemHandle[] getAllHandles(int[] tableLocs) {
         MemHandle[] handleTable = new MemHandle[currSize];
@@ -291,11 +305,24 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
     }
 
 
+    /**
+     * get size of the table
+     * 
+     * @return size of table
+     */
     public int getSize() {
         return this.currSize;
     }
 
 
+    /**
+     * test method for insert and remove
+     * 
+     * @param location
+     *            location to insert into
+     * @param hans
+     *            handle to insert
+     */
     // A test method for insert/remove
     public void testSetter(int location, MemHandle[] hans) {
         tableArray[location] = hans;

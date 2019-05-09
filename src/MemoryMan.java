@@ -1,6 +1,5 @@
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.Arrays;
 
 /**
  * @author Josh Rehm
@@ -8,6 +7,7 @@ import java.util.Arrays;
  *
  *         This is the memory manager that handles inserting sequences and
  *         sequence IDs into the memory file.
+ * @version 5/8/2019
  */
 public class MemoryMan {
     private DoublyLinkedList<FreeBlock> freeBlocks;
@@ -19,8 +19,6 @@ public class MemoryMan {
      * This is the manager that will insert sequences and IDs into the memory
      * file.
      * 
-     * @param memSize
-     *            Initial size of the memory.
      * @param memoryFile
      *            File to store sequences and ID's in.
      * @throws IOException
@@ -34,7 +32,8 @@ public class MemoryMan {
             // Only allocate if greater than 0
         }
         catch (IOException e) {
-            System.out.println("Error in memory manager constructor: " + e.toString());
+            System.out.println("Error in memory manager constructor: " + e
+                .toString());
         }
     }
 
@@ -51,7 +50,7 @@ public class MemoryMan {
      * @throws IOException
      */
     public MemHandle[] insert(String inputSequenceID, String inputSequence) {
-        MemHandle insertLocations[] = new MemHandle[2];
+        MemHandle[] insertLocations = new MemHandle[2];
         try {
             insertLocations[0] = insertID(inputSequenceID);
             insertLocations[1] = insertSequence(inputSequence);
@@ -112,10 +111,10 @@ public class MemoryMan {
 
 
     /**
-     * Removes something from the memory file given by the input handle
+     * Removes something from the memory file given by the input handles
      * 
-     * @param handle
-     *            handle of the thing to be removed.
+     * @param handles
+     *            handles of the things to be removed.
      */
     public void remove(MemHandle[] handles) {
         // Type of handle doesn't matter, we just grab each and free memory
@@ -134,18 +133,17 @@ public class MemoryMan {
             }
             boolean alreadyInserted = false;
             while (freeBlocks.hasNext()) {
-                if (cur.getPos()+cur.getLength() < offset) {
+                if (cur.getPos() + cur.getLength() < offset) {
                     freeBlocks.next();
                 }
-                else {//we find something that needs to get merged
+                else {// we find something that needs to get merged
                     freeBlocks.insert(new FreeBlock(offset, length));
                     mergeBlocks();
                     alreadyInserted = true;
                     break;
                 }
             }
-            if(alreadyInserted)
-            {
+            if (alreadyInserted) {
                 continue;
             }
             // Before we finish, we need to check against the last value
@@ -163,24 +161,30 @@ public class MemoryMan {
         }
     }
 
+
     /**
      * searchs through the memory file for the given sequence
-     * @param handle the places to look for the sequence
-     * @param sequence sequences you are looking for
-     * @return array of strings that the manager has found, empty if nothing is found
-     * @throws IOException throws if there is file access error
+     * 
+     * @param handle
+     *            the places to look for the sequence
+     * @param sequence
+     *            sequences you are looking for
+     * @return array of strings that the manager has found, empty if nothing is
+     *         found
+     * @throws IOException
+     *             throws if there is file access error
      */
     public String[] search(MemHandle handle[], String sequence[])
         throws IOException {
         Sequence sequenceIDToFind = new Sequence(sequence[0]);
         int idLength = (int)Math.ceil(handle[0].getMemLength() / 4.0);
         int seqLength = (int)Math.ceil(handle[1].getMemLength() / 4.0);
-        byte idByteFromFile[] = new byte[idLength];
+        byte[] idByteFromFile = new byte[idLength];
         bioFile.seek(handle[0].getMemLoc());
         bioFile.read(idByteFromFile, 0, idLength);
         if (idByteFromFile.equals(sequenceIDToFind.getBytes())) {
             Sequence sequenceToFind = new Sequence(sequence[1]);
-            byte seqFromFile[] = new byte[seqLength];
+            byte[] seqFromFile = new byte[seqLength];
             bioFile.seek(handle[1].getMemLoc());
             bioFile.read(seqFromFile, 0, seqLength);
             if (seqFromFile.equals(sequenceToFind.getBytes())) {
@@ -198,17 +202,21 @@ public class MemoryMan {
         }
     }
 
+
     /**
      * searches through the memory file to find things
-     * @param handles where to look for the sequences
+     * 
+     * @param handles
+     *            where to look for the sequences
      * @return array of strings that from the handle inputs
-     * @throws IOException throws when there is a file read error
+     * @throws IOException
+     *             throws when there is a file read error
      */
     public String[] print(MemHandle[] handles) throws IOException {
         String[] outputIDs = new String[handles.length];
         int i = 0;
         for (MemHandle m : handles) {
-            byte seqFromFile[] = new byte[(int)Math.ceil(m.getMemLength()
+            byte[] seqFromFile = new byte[(int)Math.ceil(m.getMemLength()
                 / 4.0)];
             bioFile.seek(m.getMemLoc());
             bioFile.read(seqFromFile, 0, (int)Math.ceil(m.getMemLength()
@@ -222,27 +230,6 @@ public class MemoryMan {
         return outputIDs;
     }
 
-    private void sortBlocks() {
-        freeBlocks.moveToHead();
-        freeBlocks.next();
-        while (freeBlocks.hasNext()) {
-            int firstLength = freeBlocks.getElement().getLength();
-            int firstPos = freeBlocks.getElement().getPos();
-            freeBlocks.next();
-            int nextStart = freeBlocks.getElement().getPos();
-            int nextLength = freeBlocks.getElement().getLength();
-
-            if (firstPos + firstLength == nextStart) {
-                freeBlocks.getElement().setBlock(firstPos, nextLength
-                    + firstLength);
-                freeBlocks.previous();
-                freeBlocks.remove();
-            }
-            else {
-                freeBlocks.next();
-            }
-        }
-    }
 
     /**
      * Iterate through the free blocks list and look for any blocks that need to
@@ -301,8 +288,16 @@ public class MemoryMan {
     }
 
 
+    /**
+     * update the free block list with a block with the location and length
+     * 
+     * @param location
+     *            location of new block
+     * @param length
+     *            length of new block
+     */
     private void updateBlockList(int location, int length) {
-        if(freeBlocks.getLength() == 0) {
+        if (freeBlocks.getLength() == 0) {
             return;
         }
         freeBlocks.moveToHead();
@@ -310,12 +305,12 @@ public class MemoryMan {
             freeBlocks.next();
             FreeBlock cur = freeBlocks.getElement();
             if (cur.getPos() == location) {
-                if(cur.getLength() == length) {
+                if (cur.getLength() == length) {
                     freeBlocks.remove();
                 }
                 else {
-                    freeBlocks.setElement(new FreeBlock(cur.getPos() + length, cur
-                    .getLength() - length));
+                    freeBlocks.setElement(new FreeBlock(cur.getPos() + length,
+                        cur.getLength() - length));
                 }
                 return;
             }
@@ -334,19 +329,23 @@ public class MemoryMan {
         // We aren't making new free blocks, just allocate at memory size
         // freeBlocks.insert(new FreeBlock(currMemSize, length));
 
-        currMemSize += length;    
+        currMemSize += length;
     }
-    
+
+
     /**
      * getter for the current memory size
+     * 
      * @return the current memory size;
      */
     public int getCurMemSize() {
         return currMemSize;
     }
 
+
     /**
      * returns the current free block list
+     * 
      * @return current free block list
      */
     public DoublyLinkedList<FreeBlock> getFreeBlocksList() {

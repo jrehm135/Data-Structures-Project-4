@@ -7,7 +7,7 @@ public class MemoryManTest extends TestCase{
     public void testInit() {
         try {
             testMan = new MemoryMan("bioFile.bin");
-            assertTrue(testMan.getCurMemSize() == 1000);
+            assertTrue(testMan.getCurMemSize() == 0);
         }
         catch (Exception IOException) {
             System.out.println("Could not find memory file.");
