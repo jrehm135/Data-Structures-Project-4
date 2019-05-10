@@ -29,8 +29,8 @@ public class HashTest extends TestCase {
         MemHandle[] handles = testMan.insert("AAAAA",
             "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT");// 2 + 10 = 12
         try {
-            hashTable.insert("AAAAA", handles);
-            hashTable.insert("AAAAA", handles);
+            hashTable.insert("AAAAA", handles, new RandomAccessFile("biofile.bin", "rw"));
+            hashTable.insert("AAAAA", handles, new RandomAccessFile("biofile.bin", "rw"));
         }
         catch (IOException e) {
             // TODO Auto-generated catch block
@@ -57,13 +57,13 @@ public class HashTest extends TestCase {
             "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT");// 2 + 10 = 12
         MemHandle[] hans = testMan.insert("CCC", "AAAATTTTCCCC");
         hashTable.testSetter((int)hashTable.hash("AAAAA", 1000), hans);
-        hashTable.insert("AAAAA", handles);
+        hashTable.insert("AAAAA", handles, new RandomAccessFile("biofile.bin", "rw"));
 
         hashTable.remove("AAAAA", new RandomAccessFile("bioFile.bin", "r"));
         testMan.remove(handles);
         assertEquals(hashTable.getHandles((int)hashTable.hash("AAAAA", 1000)),
             hans);
-        hashTable.insert("AAAAA", handles);
+        hashTable.insert("AAAAA", handles, new RandomAccessFile("biofile.bin", "rw"));
     }
 
 
@@ -78,7 +78,7 @@ public class HashTest extends TestCase {
         }
         MemHandle[] handles = testMan.insert("AAAAA",
             "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT");// 2 + 10 = 12
-        hashTable.insert("AAAAA", handles);
+        hashTable.insert("AAAAA", handles, new RandomAccessFile("biofile.bin", "rw"));
         String s = hashTable.search("AAAAA", new RandomAccessFile("bioFile.bin",
             "rw"));
         assertEquals(s, "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT");

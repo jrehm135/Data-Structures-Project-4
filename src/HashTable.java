@@ -14,8 +14,8 @@ public interface HashTable<T> {
     public long hash(String s, int M);
 
 
-    public int insert(String seqID, T[] e)
-        throws IOException;;
+    public int insert(String seqID, T[] e, RandomAccessFile file)
+        throws IOException;
 
 
     public T[] remove(String seqID, RandomAccessFile file)

@@ -7,8 +7,7 @@ import java.util.Scanner;
  * @author Josh Rehm
  * @author Quinton Miller
  * 
- * @version 5/8/2019
- *          THis is the main function for the DNA data base
+ * @version 5/8/2019 THis is the main function for the DNA data base
  *
  */
 public class DNAdbase {
@@ -18,12 +17,10 @@ public class DNAdbase {
     private static SequenceHash<MemHandle> hashTable;
     private static MemoryMan memManager;
 
-
     /**
      * this starts the DNAdbase program
      * 
-     * @param args
-     *            the memfile, hasfhfile, commandfile, and table size
+     * @param args the memfile, hasfhfile, commandfile, and table size
      */
     public static void main(String[] args) {
         hashFile = args[1];
@@ -32,12 +29,10 @@ public class DNAdbase {
         parseFile(args[0]);
     }
 
-
     /**
      * parses through the command file and runs the commands
      * 
-     * @param fileName
-     *            name of the command file to parse through
+     * @param fileName name of the command file to parse through
      */
     private static void parseFile(String fileName) {
         try {
@@ -48,84 +43,75 @@ public class DNAdbase {
             while (sc.hasNextLine()) {
                 String command = sc.next();
                 switch (command) {
-                    case "insert":
-                        String seqID = sc.next();
-                        sc.next();
-                        String sequence = sc.next();
-                        MemHandle[] handles = memManager.insert(seqID,
-                            sequence);
-                        if(hashTable.insert(seqID, handles) == -1) {
-                            System.out.println("Bucket full.Sequence " +
-                        seqID + " could not be inserted");
-                        }
-                        else if(hashTable.insert(seqID, handles) == 0) {
-                            System.out.println("SequenceID " +
-                        seqID + " exists");
-                        }
-                        break;
+                case "insert":
+                    String seqID = sc.next();
+                    sc.next();
+                    String sequence = sc.next();
+                    MemHandle[] handles = memManager.insert(seqID, sequence);
+                    int retVal = hashTable.insert(seqID, handles, seqFile);
+                    if (retVal == -1) {
+                        System.out.println("Bucket full.Sequence " + seqID + " could not be inserted");
+                    }
+                    else if (retVal == 0) {
+                        System.out.println("SequenceID " + seqID + " exists");
+                    }
+                    break;
 
-                    case "remove":
-                        seqID = sc.next();
-                        handles = hashTable.remove(seqID, seqFile);
-                        if(handles[0] == null) {
-                            System.out.println("SequenceID " + seqID + " not found");
-                        }
-                        memManager.remove(handles);
-                        byte[] fromFile = new byte[(int)Math.ceil(handles[1]
-                            .getMemLength() / 4.0)];
-                        seqFile.seek(handles[1].getMemLoc());
-                        seqFile.read(fromFile, 0, (int)Math.ceil(handles[1]
-                            .getMemLength() / 4.0));
-                        Sequence seq = new Sequence();
-                        String stringSequence = seq.bytesToString(fromFile);
-                        System.out.println("Sequence Removed: " + seqID);
-                        System.out.println(stringSequence);
-                        break;
+                case "remove":
+                    seqID = sc.next();
+                    handles = hashTable.remove(seqID, seqFile);
+                    if (handles[0] == null) {
+                        System.out.println("SequenceID " + seqID + " not found");
+                    }
+                    memManager.remove(handles);
+                    byte[] fromFile = new byte[(int) Math.ceil(handles[1].getMemLength() / 4.0)];
+                    seqFile.seek(handles[1].getMemLoc());
+                    seqFile.read(fromFile, 0, (int) Math.ceil(handles[1].getMemLength() / 4.0));
+                    Sequence seq = new Sequence();
+                    String firstString = seq.bytesToString(fromFile);
+                    String stringSequence = firstString.substring(0, handles[1].getMemLength());
+                    System.out.println("Sequence Removed " + seqID + ":");
+                    System.out.println(stringSequence);
+                    break;
 
-                    case "search":
-                        seqID = sc.next();
-                        sequence = hashTable.search(seqID, seqFile);
-                        if (sequence.equals("")) {
-                            System.out.println("SequenceID " + seqID
-                                + " not found");
-                        }
-                        else {
-                            System.out.println("Sequence Found: " + sequence);
-                        }
-                        break;
+                case "search":
+                    seqID = sc.next();
+                    sequence = hashTable.search(seqID, seqFile);
+                    if (sequence.equals("")) {
+                        System.out.println("SequenceID " + seqID + " not found");
+                    }
+                    else {
+                        System.out.println("Sequence Found: " + sequence);
+                    }
+                    break;
 
-                    case "print":
-                        int[] hashLocs = new int[hashTable.getSize()];
-                        MemHandle[] allHandles = hashTable.getAllHandles(
-                            hashLocs);
-                        String[] sOut = memManager.print(allHandles);
-                        System.out.println("Sequence IDs:");
-                        for (int i = 0; i < hashTable.getSize(); i++) {
-                            System.out.println(sOut[i] + ": hash slot ["
-                                + hashLocs[i] + "]");
-                        }
-                        DoublyLinkedList<FreeBlock> freeBlocks = memManager
-                            .getFreeBlocksList();
-                        if (freeBlocks.getLength() == 0) {
-                            System.out.println("Free Block List: none");
-                            break;
-                        }
-                        int blockCount = 0;
-                        freeBlocks.moveToHead();
-                        System.out.println("Free Block List:");
-                        while (freeBlocks.hasNext()) {
-                            freeBlocks.next();
-                            blockCount++;
-                            FreeBlock tempBlock = freeBlocks.getElement();
-                            System.out.println("[Block " + blockCount
-                                + "] Starting Byte Location: " + tempBlock
-                                    .getPos() + ", Size " + tempBlock
-                                        .getLength() + " bytes");
-                        }
+                case "print":
+                    int[] hashLocs = new int[hashTable.getSize()];
+                    MemHandle[] allHandles = hashTable.getAllHandles(hashLocs);
+                    String[] sOut = memManager.print(allHandles);
+                    System.out.println("Sequence IDs:");
+                    for (int i = 0; i < hashTable.getSize(); i++) {
+                        System.out.println(sOut[i] + ": hash slot [" + hashLocs[i] + "]");
+                    }
+                    DoublyLinkedList<FreeBlock> freeBlocks = memManager.getFreeBlocksList();
+                    if (freeBlocks.getLength() == 0) {
+                        System.out.println("Free Block List: none");
                         break;
-                    default:
-                        System.out.println("Unrecognized input");
-                        break;
+                    }
+                    int blockCount = 0;
+                    freeBlocks.moveToHead();
+                    System.out.println("Free Block List:");
+                    while (freeBlocks.hasNext()) {
+                        freeBlocks.next();
+                        blockCount++;
+                        FreeBlock tempBlock = freeBlocks.getElement();
+                        System.out.println("[Block " + blockCount + "] Starting Byte Location: " + tempBlock.getPos()
+                                + ", Size " + tempBlock.getLength() + " bytes");
+                    }
+                    break;
+                default:
+                    System.out.println("Unrecognized input");
+                    break;
                 }
             }
             sc.close();
