@@ -14,7 +14,7 @@ public interface HashTable<T> {
     public long hash(String s, int M);
 
 
-    public boolean insert(String seqID, T[] e)
+    public int insert(String seqID, T[] e)
         throws IOException;;
 
 

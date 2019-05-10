@@ -54,12 +54,22 @@ public class DNAdbase {
                         String sequence = sc.next();
                         MemHandle[] handles = memManager.insert(seqID,
                             sequence);
-                        hashTable.insert(seqID, handles);
+                        if(hashTable.insert(seqID, handles) == -1) {
+                            System.out.println("Bucket full.Sequence " +
+                        seqID + " could not be inserted");
+                        }
+                        else if(hashTable.insert(seqID, handles) == 0) {
+                            System.out.println("SequenceID " +
+                        seqID + " exists");
+                        }
                         break;
 
                     case "remove":
                         seqID = sc.next();
                         handles = hashTable.remove(seqID, seqFile);
+                        if(handles[0] == null) {
+                            System.out.println("SequenceID " + seqID + " not found");
+                        }
                         memManager.remove(handles);
                         byte[] fromFile = new byte[(int)Math.ceil(handles[1]
                             .getMemLength() / 4.0)];

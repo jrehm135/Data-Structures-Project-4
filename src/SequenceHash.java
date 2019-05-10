@@ -67,8 +67,12 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
 
 
     // Insert a memory handle into hashtable
+    // Returns an int indicating insertion details
+    // 1 for successful insert
+    // 0 for a value already in table
+    // -1 for a full bucket
     @Override
-    public boolean insert(String seqID, MemHandle[] handles)
+    public int insert(String seqID, MemHandle[] handles)
         throws IOException {
         long hashSlot = hash(seqID, tableSize);
         int bucket = (int)hashSlot / 32;
@@ -94,7 +98,7 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
             file.write(hashHandle[1].getMemLoc());
             file.seek(hashSlot * 16 + 12);
             file.write(hashHandle[1].getMemLength());
-            return true;
+            return 1;
         }
         // Check for tombstones
         else if (tableArray[(bucket * 32) + currSlot][0].equals(new MemHandle(
@@ -123,13 +127,18 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
                 file.write(hashHandle[1].getMemLoc());
                 file.seek(((bucket * 32) + currSlot) * 16 + 12);
                 file.write(hashHandle[1].getMemLength());
-                return true;
+                return 1;
             }
             // Find first tombstone in sequence
             else if (tableArray[(bucket * 32) + currSlot][0].equals(
                 new MemHandle(-1, -1)) && !tombFound) {
                 lowestTombstone = (bucket * 32) + currSlot;
                 tombFound = true;
+            }
+            //The given handles already exist in the table
+            else if (tableArray[(bucket * 32) + currSlot].equals(
+                    handles)) {
+                return 0;
             }
 
             // Move to next slot
@@ -151,10 +160,10 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
             file.write(hashHandle[1].getMemLoc());
             file.seek(((bucket * 32) + currSlot) * 16 + 12);
             file.write(hashHandle[1].getMemLength());
-            return true;
+            return 1;
         }
         // If we make it here, then the bucket is full, reject insert
-        return false;
+        return -1;
     }
 
 
