@@ -80,6 +80,7 @@ public class DNAdbase {
                         if (handles[0] == null) {
                             System.out.println("SequenceID " + seqID
                                 + " not found");
+                            continue;
                         }
                         memManager.remove(handles);
                         byte[] fromFile = new byte[(int)Math.ceil(handles[1]

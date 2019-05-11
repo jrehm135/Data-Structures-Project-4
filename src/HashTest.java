@@ -261,7 +261,7 @@ public class HashTest extends TestCase {
             "biofile.bin", "rw"));
         testMan.remove(remHan1);
         testMan.remove(remHan2);
-
+        
         handles31 = testMan.insert("TTTTGGGG",
             "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
         hashTable.insert("TTTTGGGG", handles, new RandomAccessFile(
@@ -271,7 +271,9 @@ public class HashTest extends TestCase {
             "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
         hashTable.insert("A", handles, new RandomAccessFile("biofile.bin",
             "rw"));
-        assertTrue(true);
+        DoublyLinkedList<FreeBlock> test = testMan.getFreeBlocksList();
+        assertEquals(test.getLength(), 1);
+        
     }
 
 
