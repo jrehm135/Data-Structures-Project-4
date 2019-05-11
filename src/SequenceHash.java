@@ -88,7 +88,7 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
         // Iterate through slots until one is found
         // Use a for loop to keep track of tombstones
         do {
-            if (tableArray[(bucket * 32) + currSlot][0] == null) {
+            if (tableArray[(bucket * 32) + currSlot][0] == null && !tombFound) {
                 // Need to initialize a different array to store
                 MemHandle[] hashHandle = new MemHandle[2];
                 System.arraycopy(handles, 0, hashHandle, 0, 2);
@@ -105,11 +105,31 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
                 file.write(hashHandle[1].getMemLength());
                 return 1;
             }
+            else if(tableArray[(bucket * 32) + currSlot][0] == null) {
+                MemHandle[] hashHandle = new MemHandle[2];
+                System.arraycopy(handles, 0, hashHandle, 0, 2);
+                tableArray[lowestTombstone] = hashHandle;
+                currSize++;
+                // Store values in hash file
+                file.seek(lowestTombstone * 16);
+                file.write(hashHandle[0].getMemLoc());
+                file.seek(lowestTombstone * 16 + 4);
+                file.write(hashHandle[0].getMemLength());
+                file.seek(lowestTombstone * 16 + 8);
+                file.write(hashHandle[1].getMemLoc());
+                file.seek(lowestTombstone * 16 + 12);
+                file.write(hashHandle[1].getMemLength());
+                return 1;
+            }
             // Find first tombstone in sequence
-            else if (tableArray[(bucket * 32) + currSlot][0].equals(
-                tombStone) && !tombFound) {
+            else if (tableArray[(bucket * 32) + currSlot][0].getMemLoc() ==
+                tombStone.getMemLoc() && tableArray[(bucket * 32) + currSlot][0].getMemLength() ==
+                        tombStone.getMemLength() && !tombFound) {
                 lowestTombstone = (bucket * 32) + currSlot;
                 tombFound = true;
+                // Move to next slot
+                currSlot = (currSlot + 1) % 32;
+                continue;
             }
             // The given handles already exist in the table
             byte[] fromFile = new byte[(int)Math.ceil(tableArray[(bucket * 32)
