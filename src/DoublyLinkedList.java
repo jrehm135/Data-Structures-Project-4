@@ -87,7 +87,7 @@ public class DoublyLinkedList<T> {
          * @return node element
          */
         public T getElement() {
-            return element;
+            return this.element;
         }
     }
 
@@ -280,8 +280,9 @@ public class DoublyLinkedList<T> {
      */
     public boolean search(T e) {
         Node temp = head.getNext();
+        T foo = temp.getElement();
         while (temp != tail) {
-            if (temp.getElement().equals(e)) {
+            if (foo.equals(e)) {
                 curr = temp;
                 return true;
             }

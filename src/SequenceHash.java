@@ -5,9 +5,10 @@ import java.io.RandomAccessFile;
  * 
  * @author Josh Rehm
  * @author Quinton Miller
+ * @version 5/10/2019
  *
  * @param <T>
- *            things to stor in the hash table
+ *            things to store in the hash table
  */
 public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
     private MemHandle[][] tableArray;
@@ -26,7 +27,7 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
      *            file to store the hashes in
      */
     SequenceHash(int tableSize, String hashFile) {
-        try {// Create a matrix with size tablesize and 2 elements per row
+        try { // Create a matrix with size tablesize and 2 elements per row
             tableArray = new MemHandle[tableSize][2];
             this.tableSize = tableSize;
             currSize = 0;
@@ -72,15 +73,18 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
     // 0 for a value already in table
     // -1 for a full bucket
     @Override
-    public int insert(String seqID, MemHandle[] handles, RandomAccessFile seqFile)
+    public int insert(
+        String seqID,
+        MemHandle[] handles,
+        RandomAccessFile seqFile)
         throws IOException {
         long hashSlot = hash(seqID, tableSize);
         int bucket = (int)hashSlot / 32;
         int currSlot = (int)hashSlot % 32;
-
+        MemHandle tombStone = new MemHandle(-1, -1);
         int lowestTombstone = -1;
         boolean tombFound = false;
-        
+
         // Iterate through slots until one is found
         // Use a for loop to keep track of tombstones
         do {
@@ -103,25 +107,24 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
             }
             // Find first tombstone in sequence
             else if (tableArray[(bucket * 32) + currSlot][0].equals(
-                new MemHandle(-1, -1)) && !tombFound) {
+                tombStone) && !tombFound) {
                 lowestTombstone = (bucket * 32) + currSlot;
                 tombFound = true;
             }
-            //The given handles already exist in the table
-            byte[] fromFile = new byte[(int)Math.ceil(
-                    tableArray[(bucket * 32) + currSlot][0].getMemLength()
-                    / 4.0)];
+            // The given handles already exist in the table
+            byte[] fromFile = new byte[(int)Math.ceil(tableArray[(bucket * 32)
+                + currSlot][0].getMemLength() / 4.0)];
             // Read from file location for comparison
             seqFile.seek(tableArray[(bucket * 32) + currSlot][0].getMemLoc());
-            seqFile.read(fromFile, 0, (int)Math.ceil(
-                    tableArray[(bucket * 32) + currSlot][0].getMemLength()
-                    / 4.0));
+            seqFile.read(fromFile, 0, (int)Math.ceil(tableArray[(bucket * 32)
+                + currSlot][0].getMemLength() / 4.0));
             // Convert to a sequence to compare
             Sequence temp = new Sequence();
             String fullBytes = temp.bytesToString(fromFile);
             // We must then shorten the string to the proper length
-            String fileID = fullBytes.substring(0,  tableArray[(bucket * 32) + currSlot][0].getMemLength());
-            
+            String fileID = fullBytes.substring(0, tableArray[(bucket * 32)
+                + currSlot][0].getMemLength());
+
             if (fileID.equals(seqID)) {
                 return 0;
             }
@@ -167,9 +170,10 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
         }
         do {
             // We want to skip over tombstones
-            if (tableArray[(bucket * 32) + currSlot][0] == null
-                || tableArray[(bucket * 32) + currSlot][0].equals(new MemHandle(
-                    -1, -1))) {
+            if (tableArray[(bucket * 32) + currSlot][0].equals(new MemHandle(-1,
+                -1))) {
+
+                currSlot = (currSlot + 1) % 32;
                 continue;
             }
             MemHandle idHandle = tableArray[(bucket * 32) + currSlot][0];
@@ -233,7 +237,7 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
             byte[] fromFile = new byte[(int)Math.ceil(idHandle.getMemLength()
                 / 4.0)];
             if (offset == -1 || length == -1) {
-                break;
+                continue;
             }
             // Read from file location for comparison
             seqFile.seek(offset);
@@ -272,6 +276,58 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
     @Override
     public MemHandle[] getHandles(int location) {
         return tableArray[location];
+    }
+
+
+    /**
+     * Checks to see if the sequence ID is already in the hash table
+     * 
+     * @param seqID
+     *            id to look for
+     * @param hashFile
+     *            hash file to look through
+     * @return if seqID is in the table.
+     */
+    public boolean checkForDuplicate(String seqID, RandomAccessFile hashFile) {
+        long hashSlot = hash(seqID, tableSize);
+        int bucket = (int)hashSlot / 32;
+        int currSlot = (int)hashSlot % 32;
+
+        // look at first slot
+        if (tableArray[(bucket * 32) + currSlot][0] == null) {
+            return true;
+        }
+        do {
+            try {
+                MemHandle idHandle = tableArray[(bucket * 32) + currSlot][0];
+                int offset = idHandle.getMemLoc();
+                int length = idHandle.getMemLength();
+                byte[] fromFile = new byte[(int)Math.ceil(idHandle
+                    .getMemLength() / 4.0)];
+                if (offset == -1 || length == -1) {
+                    continue;
+                }
+                // Read from file location for comparison
+                hashFile.seek(offset);
+                hashFile.read(fromFile, 0, (int)Math.ceil(idHandle
+                    .getMemLength() / 4.0));
+                // Convert to a sequence to compare
+                Sequence temp = new Sequence();
+                String fullBytes = temp.bytesToString(fromFile);
+                // We must then shorten the string to the proper length
+                String fileID = fullBytes.substring(0, length);
+                if (fileID.equals(seqID)) {
+                    return false;
+                }
+            }
+            catch (IOException e) {
+                System.out.println("issue with file access");
+            }
+            // Move to next slot
+            currSlot = (currSlot + 1) % 32;
+        }
+        while ((bucket * 32) + currSlot != hashSlot);
+        return false;
     }
 
 

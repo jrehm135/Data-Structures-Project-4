@@ -48,9 +48,9 @@ public class FreeBlock {
     /**
      * set the block values
      * 
-     * @param pos
+     * @param newPos
      *            new block pos
-     * @param length
+     * @param newLength
      *            new block length
      */
     public void setBlock(int newPos, int newLength) {

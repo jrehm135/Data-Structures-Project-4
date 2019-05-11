@@ -68,7 +68,10 @@ public class Sequence {
         return this.seqLength;
     }
 
-
+    /**
+     * get the bytes of the sequence
+     * @return byte array of sequence
+     */
     public byte[] getBytes() {
         return this.seqArray;
     }
