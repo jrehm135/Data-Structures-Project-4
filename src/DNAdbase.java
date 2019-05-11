@@ -54,14 +54,17 @@ public class DNAdbase {
                         sc.next();
                         String sequence = sc.next();
                         try {
-                            handles = memManager.insert(seqID, sequence);
-                            int retVal = hashTable.insert(seqID, handles,
+                            int searchFlag = hashTable.checkForDuplicate(seqID,
                                 seqFile);
-                            if (retVal == -1) {
+                            if (searchFlag == 1) {
+                                handles = memManager.insert(seqID, sequence);
+                                hashTable.insert(seqID, handles, seqFile);
+                            }
+                            else if (searchFlag == -1) {
                                 System.out.println("Bucket full.Sequence "
                                     + seqID + " could not be inserted");
                             }
-                            else if (retVal == 0) {
+                            else if (searchFlag == 0) {
                                 System.out.println("SequenceID " + seqID
                                     + " exists");
                             }

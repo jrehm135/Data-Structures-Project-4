@@ -308,17 +308,17 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
      *            hash file to look through
      * @return if seqID is in the table.
      */
-    public boolean checkForDuplicate(String seqID, RandomAccessFile hashFile) {
+    public int checkForDuplicate(String seqID, RandomAccessFile hashFile) {
         long hashSlot = hash(seqID, tableSize);
         int bucket = (int)hashSlot / 32;
         int currSlot = (int)hashSlot % 32;
 
-        // look at first slot
-        if (tableArray[(bucket * 32) + currSlot][0] == null) {
-            return true;
-        }
         do {
             try {
+                //look to see if slot is null, if so we can insert.
+                if (tableArray[(bucket * 32) + currSlot][0] == null) {
+                    return 1;
+                }
                 MemHandle idHandle = tableArray[(bucket * 32) + currSlot][0];
                 int offset = idHandle.getMemLoc();
                 int length = idHandle.getMemLength();
@@ -338,7 +338,7 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
                 // We must then shorten the string to the proper length
                 String fileID = fullBytes.substring(0, length);
                 if (fileID.equals(seqID)) {
-                    return false;
+                    return 0; //the sequence is already in the table
                 }
             }
             catch (IOException e) {
@@ -348,7 +348,7 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
             currSlot = (currSlot + 1) % 32;
         }
         while ((bucket * 32) + currSlot != hashSlot);
-        return false;
+        return -1; //this means the bucket is full
     }
 
 
