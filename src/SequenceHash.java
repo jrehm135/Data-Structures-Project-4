@@ -198,11 +198,12 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
         }
         do {
             // We want to skip over tombstones
-            if (tableArray[(bucket * 32) + currSlot][0].equals(new MemHandle(-1,
-                -1))) {
-
-                currSlot = (currSlot + 1) % 32;
-                continue;
+            if (tableArray[(bucket * 32) + currSlot][0].getMemLoc() ==
+                    -1 && tableArray[(bucket * 32) + currSlot][0].getMemLength() ==
+                            -1) {
+                    // Move to next slot
+                    currSlot = (currSlot + 1) % 32;
+                    continue;
             }
             MemHandle idHandle = tableArray[(bucket * 32) + currSlot][0];
             int offset = idHandle.getMemLoc();
