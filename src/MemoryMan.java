@@ -289,6 +289,7 @@ public class MemoryMan {
         freeBlocks.moveToHead();
         freeBlocks.next();
         FreeBlock cur = freeBlocks.getElement();
+        boolean alreadyRemoved = false;
         // Make sure to return the memsize if the value is null
         if (cur == null) {
             return currMemSize;
@@ -300,6 +301,7 @@ public class MemoryMan {
             else if (cur.getLength() == lengthNeeded) {
                 // If the blocks are equal, simply remove
                 freeBlocks.remove();
+                alreadyRemoved = true;
                 break;
             }
             freeBlocks.next();
@@ -308,7 +310,7 @@ public class MemoryMan {
         if (cur.getLength() < lengthNeeded) {
             return currMemSize;
         }
-        else if (cur.getLength() == lengthNeeded) {
+        else if (cur.getLength() == lengthNeeded && !alreadyRemoved) {
             // If the blocks are equal, simply remove
             freeBlocks.remove();
         }
