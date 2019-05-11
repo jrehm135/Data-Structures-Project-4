@@ -191,14 +191,12 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
         int bucket = (int)hashSlot / 32;
         int currSlot = (int)hashSlot % 32;
 
-        // Try first slot to check for availability
-        // We only need to check the first value since the values are related
-        if (tableArray[(bucket * 32) + currSlot][0] == null) {
-            return tableArray[(bucket * 32) + currSlot];
-        }
         do {
+            if (tableArray[(bucket * 32) + currSlot][0] == null) {
+                return tableArray[(bucket * 32) + currSlot];
+            }
             // We want to skip over tombstones
-            if (tableArray[(bucket * 32) + currSlot][0].getMemLoc() ==
+            else if (tableArray[(bucket * 32) + currSlot][0].getMemLoc() ==
                     -1 && tableArray[(bucket * 32) + currSlot][0].getMemLength() ==
                             -1) {
                     // Move to next slot
