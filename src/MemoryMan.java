@@ -157,14 +157,28 @@ public class MemoryMan {
                 mergeBlocks();
             }
             else {
-                if (offset + length == getCurMemSize()) {
-                    shrinkMemSize(length);
-                    return;
-                }
+               
                 // At this point, we have made it to the end of the list,
                 // so we add a FreeBlock to the end
                 freeBlocks.insert(new FreeBlock(offset, length));
                 mergeBlocks();
+            }
+            freeBlocks.moveToTail();
+            freeBlocks.previous();
+            cur = freeBlocks.getElement();
+            while(cur!=null)
+            {
+                if(cur.getLength() + cur.getPos() == getCurMemSize())
+                {
+                    freeBlocks.remove();
+                    shrinkMemSize(cur.getLength());
+                    freeBlocks.previous();
+                    cur = freeBlocks.getElement();
+                }
+                else
+                {
+                    break;
+                }
             }
         }
     }

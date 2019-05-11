@@ -93,6 +93,7 @@ public class MemoryManTest extends TestCase {
 
         testList = testMan.getFreeBlocksList();
         assertEquals(testList.getLength(), 0);
+        
     }
 
 }
