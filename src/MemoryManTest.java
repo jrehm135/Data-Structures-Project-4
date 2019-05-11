@@ -38,12 +38,12 @@ public class MemoryManTest extends TestCase {
             return;
         }
         MemHandle[] han = testMan.insert("AAAAA",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2 + 10 = 12
-        testMan.insert("AAAA", "AAAATTTTCCCCGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2
-                                                                           // +
-                                                                           // 10
-                                                                           // =
-                                                                           // 12
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2 + 10 = 12
+        testMan.insert("AAAA", "AAAATTTTCCCCGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2
+                                                                               // +
+                                                                               // 10
+                                                                               // =
+                                                                               // 12
         DoublyLinkedList<FreeBlock> testList = testMan.getFreeBlocksList();
         assertEquals(testList.getLength(), 0);
         assertEquals(han[0].getMemLength(), 5);
@@ -73,14 +73,14 @@ public class MemoryManTest extends TestCase {
             return;
         }
         MemHandle[] handles = testMan.insert("AAAAA",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2 + 10 = 12
-        testMan.insert("TTTTT", "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT");
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2 + 10 = 12
+        testMan.insert("TTTTT", "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40);
         // 2 + 10 = 12
 
         testMan.remove(handles);
 
         // Test less than block size
-        testMan.insert("CCC", "AAAATTTTCCCCGGGGAA"); // 1 + 5 = 6
+        testMan.insert("CCC", "AAAATTTTCCCCGGGGAA",18); // 1 + 5 = 6
 
         DoublyLinkedList<FreeBlock> testList = testMan.getFreeBlocksList();
         testList.moveToHead();
@@ -91,7 +91,7 @@ public class MemoryManTest extends TestCase {
         testList.next();
 
         // Test equal to block size
-        testMan.insert("TTT", "AAAATTTTCCCCGGGGAA"); // 1 + 5 = 6
+        testMan.insert("TTT", "AAAATTTTCCCCGGGGAA", 18); // 1 + 5 = 6
 
         testList = testMan.getFreeBlocksList();
         assertEquals(testList.getLength(), 0);

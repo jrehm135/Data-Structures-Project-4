@@ -51,13 +51,13 @@ public class DNAdbase {
                 switch (command) {
                     case "insert":
                         String seqID = sc.next();
-                        sc.next();
+                        int length = sc.nextInt();
                         String sequence = sc.next();
                         try {
                             int searchFlag = hashTable.checkForDuplicate(seqID,
                                 seqFile);
                             if (searchFlag == 1) {
-                                handles = memManager.insert(seqID, sequence);
+                                handles = memManager.insert(seqID, sequence, length);
                                 hashTable.insert(seqID, handles, seqFile);
                             }
                             else if (searchFlag == -1) {

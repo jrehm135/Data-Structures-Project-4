@@ -49,11 +49,11 @@ public class MemoryMan {
      *         was in IOException
      * @throws IOException
      */
-    public MemHandle[] insert(String inputSequenceID, String inputSequence) {
+    public MemHandle[] insert(String inputSequenceID, String inputSequence, int inputLength) {
         MemHandle[] insertLocations = new MemHandle[2];
         try {
             insertLocations[0] = insertID(inputSequenceID);
-            insertLocations[1] = insertSequence(inputSequence);
+            insertLocations[1] = insertSequence(inputSequence, inputLength);
             return insertLocations;
         }
         catch (Exception IOException) {
@@ -96,9 +96,9 @@ public class MemoryMan {
      * @throws IOException
      *             Throws when trying to write to invalid memory location.
      */
-    public MemHandle insertSequence(String inputSequence) throws IOException {
+    public MemHandle insertSequence(String inputSequence, int inputLength) throws IOException {
         Sequence newInsert = new Sequence(inputSequence);
-        int seqLength = (int)Math.ceil(newInsert.getLength() / 4.0);
+        int seqLength = (int)Math.ceil(inputLength / 4.0);
         int insertLoc = getNextMemPosition(seqLength);
         if (insertLoc + seqLength > currMemSize) {
             growMemSize(seqLength);
@@ -106,7 +106,7 @@ public class MemoryMan {
         bioFile.seek(insertLoc);
         bioFile.write(newInsert.getBytes());
         updateBlockList(insertLoc, seqLength);
-        return new MemHandle(insertLoc, newInsert.getLength());
+        return new MemHandle(insertLoc, inputLength);
     }
 
 
@@ -140,12 +140,12 @@ public class MemoryMan {
                     freeBlocks.insertBefore(new FreeBlock(offset, length));
                     alreadyInserted = true;
                     break;
-                    }
+                }
                 else {
                     // we find something that needs to get merged
                     freeBlocks.next();
                     cur = freeBlocks.getElement();
-                    
+
                 }
             }
             if (alreadyInserted) {
@@ -344,7 +344,7 @@ public class MemoryMan {
             }
         }
         while (freeBlocks.hasNext());
-        
+
     }
 
 

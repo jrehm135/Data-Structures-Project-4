@@ -30,7 +30,7 @@ public class HashTest extends TestCase {
         }
 
         MemHandle[] handles = testMan.insert("AAAAA",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2 + 10 = 12
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2 + 10 = 12
         try {
             hashTable.insert("AAAAA", handles, new RandomAccessFile(
                 "biofile.bin", "rw"));
@@ -76,8 +76,8 @@ public class HashTest extends TestCase {
         }
 
         MemHandle[] handles = testMan.insert("AAAACCCC",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2 + 10 = 12
-        testMan.insert("CCC", "AAAATTTTCCCC");
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2 + 10 = 12
+        testMan.insert("CCC", "AAAATTTTCCCC", 12);
         // hashTable.testSetter((int)hashTable.hash("AAAAA", 1000), hans);
         hashTable.insert("AAAACCCC", handles, new RandomAccessFile(
             "biofile.bin", "rw"));
@@ -123,69 +123,69 @@ public class HashTest extends TestCase {
         }
 
         MemHandle[] handles = testMan.insert("A",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 1 + 10 = 11
         MemHandle[] handles1 = testMan.insert("AA",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 1 + 10 = 11
         MemHandle[] handles2 = testMan.insert("AAA",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 1 + 10 = 11
         MemHandle[] handles3 = testMan.insert("AAAA",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 1 + 10 = 11
         MemHandle[] handles4 = testMan.insert("AAAAC",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2 + 10 = 12
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2 + 10 = 12
         MemHandle[] handles5 = testMan.insert("AAAACC",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2 + 10 = 12
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2 + 10 = 12
         MemHandle[] handles6 = testMan.insert("AAAACCC",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2 + 10 = 12
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2 + 10 = 12
         MemHandle[] handles7 = testMan.insert("AAAACCCC",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2 + 10 = 12
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2 + 10 = 12
         MemHandle[] handles8 = testMan.insert("C",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 1 + 10 = 11
         MemHandle[] handles9 = testMan.insert("CC",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 1 + 10 = 11
         MemHandle[] handles10 = testMan.insert("CCC",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 1 + 10 = 11
         MemHandle[] handles11 = testMan.insert("CCCC",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 1 + 10 = 11
         MemHandle[] handles12 = testMan.insert("CCCCA",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2 + 10 = 12
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2 + 10 = 12
         MemHandle[] handles13 = testMan.insert("CCCCAA",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2 + 10 = 12
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2 + 10 = 12
         MemHandle[] handles14 = testMan.insert("CCCCAAA",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2 + 10 = 12
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2 + 10 = 12
         MemHandle[] handles15 = testMan.insert("CCCCAAAA",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2 + 10 = 12
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2 + 10 = 12
         MemHandle[] handles16 = testMan.insert("G",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 1 + 10 = 11
         MemHandle[] handles17 = testMan.insert("GG",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 1 + 10 = 11
         MemHandle[] handles18 = testMan.insert("GGG",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 1 + 10 = 11
         MemHandle[] handles19 = testMan.insert("GGGG",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 1 + 10 = 11
         MemHandle[] handles20 = testMan.insert("GGGGT",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2 + 10 = 12
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2 + 10 = 12
         MemHandle[] handles21 = testMan.insert("GGGGTT",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2 + 10 = 12
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2 + 10 = 12
         MemHandle[] handles22 = testMan.insert("GGGGTTT",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2 + 10 = 12
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2 + 10 = 12
         MemHandle[] handles23 = testMan.insert("GGGGTTTT",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2 + 10 = 12
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2 + 10 = 12
         MemHandle[] handles24 = testMan.insert("T",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 1 + 10 = 11
         MemHandle[] handles25 = testMan.insert("TT",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 1 + 10 = 11
         MemHandle[] handles26 = testMan.insert("TTT",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 1 + 10 = 11
         MemHandle[] handles27 = testMan.insert("TTTT",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 1 + 10 = 11
         MemHandle[] handles28 = testMan.insert("TTTTG",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2 + 10 = 12
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2 + 10 = 12
         MemHandle[] handles29 = testMan.insert("TTTTGG",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2 + 10 = 12
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2 + 10 = 12
         MemHandle[] handles30 = testMan.insert("TTTTGGG",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2 + 10 = 12
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2 + 10 = 12
         MemHandle[] handles31 = testMan.insert("TTTTGGGG",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2 + 10 = 12
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2 + 10 = 12
 
         hashTable.insert("A", handles, new RandomAccessFile("biofile.bin",
             "rw"));
@@ -261,19 +261,19 @@ public class HashTest extends TestCase {
             "biofile.bin", "rw"));
         testMan.remove(remHan1);
         testMan.remove(remHan2);
-        
+
         handles31 = testMan.insert("TTTTGGGG",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 1 + 10 = 11
         hashTable.insert("TTTTGGGG", handles, new RandomAccessFile(
             "biofile.bin", "rw"));
 
         handles = testMan.insert("A",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 1 + 10 = 11
         hashTable.insert("A", handles, new RandomAccessFile("biofile.bin",
             "rw"));
         DoublyLinkedList<FreeBlock> test = testMan.getFreeBlocksList();
         assertEquals(test.getLength(), 1);
-        
+
     }
 
 
@@ -295,7 +295,7 @@ public class HashTest extends TestCase {
             return;
         }
         MemHandle[] handles = testMan.insert("AAAAA",
-            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2 + 10 = 12
+            "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2 + 10 = 12
         hashTable.insert("AAAAA", handles, new RandomAccessFile("biofile.bin",
             "rw"));
         String s = hashTable.search("AAAAA", new RandomAccessFile("bioFile.bin",
