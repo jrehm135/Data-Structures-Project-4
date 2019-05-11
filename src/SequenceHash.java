@@ -105,7 +105,7 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
                 file.write(hashHandle[1].getMemLength());
                 return 1;
             }
-            else if(tableArray[(bucket * 32) + currSlot][0] == null) {
+            else if (tableArray[(bucket * 32) + currSlot][0] == null) {
                 MemHandle[] hashHandle = new MemHandle[2];
                 System.arraycopy(handles, 0, hashHandle, 0, 2);
                 tableArray[lowestTombstone] = hashHandle;
@@ -122,9 +122,10 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
                 return 1;
             }
             // Find first tombstone in sequence
-            else if (tableArray[(bucket * 32) + currSlot][0].getMemLoc() ==
-                tombStone.getMemLoc() && tableArray[(bucket * 32) + currSlot][0].getMemLength() ==
-                        tombStone.getMemLength() && !tombFound) {
+            else if (tableArray[(bucket * 32) + currSlot][0]
+                .getMemLoc() == tombStone.getMemLoc() && tableArray[(bucket
+                    * 32) + currSlot][0].getMemLength() == tombStone
+                        .getMemLength() && !tombFound) {
                 lowestTombstone = (bucket * 32) + currSlot;
                 tombFound = true;
                 // Move to next slot
@@ -322,7 +323,7 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
 
         do {
             try {
-                //look to see if slot is null, if so we can insert.
+                // look to see if slot is null, if so we can insert.
                 if (tableArray[(bucket * 32) + currSlot][0] == null) {
                     return 1;
                 }
@@ -345,7 +346,7 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
                 // We must then shorten the string to the proper length
                 String fileID = fullBytes.substring(0, length);
                 if (fileID.equals(seqID)) {
-                    return 0; //the sequence is already in the table
+                    return 0; // the sequence is already in the table
                 }
             }
             catch (IOException e) {
@@ -355,7 +356,7 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
             currSlot = (currSlot + 1) % 32;
         }
         while ((bucket * 32) + currSlot != hashSlot);
-        return -1; //this means the bucket is full
+        return -1; // this means the bucket is full
     }
 
 

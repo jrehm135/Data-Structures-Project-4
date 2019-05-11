@@ -1,3 +1,4 @@
+import static org.junit.Assert.assertNotEquals;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -78,29 +79,29 @@ public class HashTest extends TestCase {
         MemHandle[] handles = testMan.insert("AAAACCCC",
             "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2 + 10 = 12
         testMan.insert("CCC", "AAAATTTTCCCC");
-        //hashTable.testSetter((int)hashTable.hash("AAAAA", 1000), hans);
-        hashTable.insert("AAAACCCC", handles, new RandomAccessFile("biofile.bin",
-            "rw"));
+        // hashTable.testSetter((int)hashTable.hash("AAAAA", 1000), hans);
+        hashTable.insert("AAAACCCC", handles, new RandomAccessFile(
+            "biofile.bin", "rw"));
 
         hashTable.remove("AAAACCCC", new RandomAccessFile("bioFile.bin", "r"));
         testMan.remove(handles);
-        MemHandle[] actual = hashTable.getHandles((int)hashTable.hash("AAAACCCC",
-            1000));
+        MemHandle[] actual = hashTable.getHandles((int)hashTable.hash(
+            "AAAACCCC", 1000));
         assertEquals(actual[0].getMemLength(), -1);
         assertEquals(actual[0].getMemLoc(), -1);
         assertEquals(actual[1].getMemLength(), -1);
         assertEquals(actual[1].getMemLoc(), -1);
-        hashTable.insert("CCCCAAAA", handles, new RandomAccessFile("biofile.bin",
-            "rw"));
+        hashTable.insert("CCCCAAAA", handles, new RandomAccessFile(
+            "biofile.bin", "rw"));
         actual = hashTable.getHandles((int)hashTable.hash("AAAACCCC", 1000));
-        assertFalse(actual[0].getMemLength() == -1);
-        assertFalse(actual[0].getMemLoc() == -1);
-        assertFalse(actual[1].getMemLength() == -1);
-        assertFalse(actual[1].getMemLoc() == -1);
-//        assertEquals(hashTable.getHandles((int)hashTable.hash("AAAAA", 1000)),
-//            hans);
+        assertNotEquals(actual[0].getMemLength(), -1);
+        assertNotEquals(actual[0].getMemLoc(), -1);
+        assertNotEquals(actual[1].getMemLength(), -1);
+        assertNotEquals(actual[1].getMemLoc(), -1);
+// assertEquals(hashTable.getHandles((int)hashTable.hash("AAAAA", 1000)),
+// hans);
         hashTable.insert("AAAAA", handles, new RandomAccessFile("biofile.bin",
-                "rw"));
+            "rw"));
     }
 
 

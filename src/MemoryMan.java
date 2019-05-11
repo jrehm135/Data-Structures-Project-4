@@ -137,7 +137,7 @@ public class MemoryMan {
                     freeBlocks.next();
                     cur = freeBlocks.getElement();
                 }
-                else { 
+                else {
                     // we find something that needs to get merged
                     freeBlocks.insert(new FreeBlock(offset, length));
                     mergeBlocks();
@@ -150,11 +150,17 @@ public class MemoryMan {
             }
             // Before we finish, we need to check against the last value
             if (cur.getPos() + cur.getLength() > offset) {
+               
+
                 // We want to insert before the last value
                 freeBlocks.insertBefore(new FreeBlock(offset, length));
                 mergeBlocks();
             }
             else {
+                if (offset + length == getCurMemSize()) {
+                    shrinkMemSize(length);
+                    return;
+                }
                 // At this point, we have made it to the end of the list,
                 // so we add a FreeBlock to the end
                 freeBlocks.insert(new FreeBlock(offset, length));
@@ -333,8 +339,15 @@ public class MemoryMan {
 
         currMemSize += length;
     }
+    
+    /**
+     * shrink the size of the memory
+     * @param length amount to shrink by
+     */
+    private void shrinkMemSize(int length) {
 
-
+        currMemSize -= length;
+    }
     /**
      * getter for the current memory size
      * 
