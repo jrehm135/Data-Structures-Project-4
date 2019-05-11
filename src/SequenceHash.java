@@ -253,18 +253,19 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
         long hashSlot = hash(seqID, tableSize);
         int bucket = (int)hashSlot / 32;
         int currSlot = (int)hashSlot % 32;
-
-        // look at first slot
-        if (tableArray[(bucket * 32) + currSlot][0] == null) {
-            return "";
-        }
+        
         do {
+            // look at first slot
+            if (tableArray[(bucket * 32) + currSlot][0] == null) {
+                return "";
+            }
             MemHandle idHandle = tableArray[(bucket * 32) + currSlot][0];
             int offset = idHandle.getMemLoc();
             int length = idHandle.getMemLength();
             byte[] fromFile = new byte[(int)Math.ceil(idHandle.getMemLength()
                 / 4.0)];
             if (offset == -1 || length == -1) {
+                currSlot = (currSlot + 1) % 32;
                 continue;
             }
             // Read from file location for comparison
