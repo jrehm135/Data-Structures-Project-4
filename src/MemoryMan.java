@@ -135,6 +135,7 @@ public class MemoryMan {
             while (freeBlocks.hasNext()) {
                 if (cur.getPos() + cur.getLength() < offset) {
                     freeBlocks.next();
+                    cur = freeBlocks.getElement();
                 }
                 else { 
                     // we find something that needs to get merged
@@ -148,7 +149,7 @@ public class MemoryMan {
                 continue;
             }
             // Before we finish, we need to check against the last value
-            if (cur.getPos() > offset) {
+            if (cur.getPos() + cur.getLength() > offset) {
                 // We want to insert before the last value
                 freeBlocks.insertBefore(new FreeBlock(offset, length));
                 mergeBlocks();
