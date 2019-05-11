@@ -261,9 +261,14 @@ public class HashTest extends TestCase {
         testMan.remove(remHan1);
         testMan.remove(remHan2);
         
-        handles = testMan.insert("TTTTGGGG",
+        handles31 = testMan.insert("TTTTGGGG",
                 "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
         hashTable.insert("TTTTGGGG", handles, new RandomAccessFile(
+                "biofile.bin", "rw"));
+        
+        handles = testMan.insert("A",
+                "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
+        hashTable.insert("A", handles, new RandomAccessFile(
                 "biofile.bin", "rw"));
     }
 

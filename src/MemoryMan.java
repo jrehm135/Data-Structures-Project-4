@@ -117,6 +117,9 @@ public class MemoryMan {
      *            handles of the things to be removed.
      */
     public void remove(MemHandle[] handles) {
+        if (handles[0] == null) {
+            return;
+        }
         // Type of handle doesn't matter, we just grab each and free memory
         for (MemHandle handle : handles) {
             int offset = handle.getMemLoc();
@@ -294,7 +297,6 @@ public class MemoryMan {
             return currMemSize;
         }
         while (freeBlocks.hasNext()) {
-            //
             if (cur.getLength() > lengthNeeded) {
                 break;
             }
@@ -305,6 +307,13 @@ public class MemoryMan {
             }
             freeBlocks.next();
             cur = freeBlocks.getElement();
+        }
+        if (cur.getLength() < lengthNeeded) {
+            return currMemSize;
+        }
+        else if (cur.getLength() == lengthNeeded) {
+            // If the blocks are equal, simply remove
+            freeBlocks.remove();
         }
         return cur.getPos();
     }
