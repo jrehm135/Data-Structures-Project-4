@@ -39,11 +39,8 @@ public class MemoryManTest extends TestCase {
         }
         MemHandle[] han = testMan.insert("AAAAA",
             "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2 + 10 = 12
-        testMan.insert("AAAA", "AAAATTTTCCCCGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2
-                                                                               // +
-                                                                               // 10
-                                                                               // =
-                                                                               // 12
+        testMan.insert("AAAA", "AAAATTTTCCCCGGGAAAACCCCGGGGTTTTAAAATTTT", 40);
+        // 2 + 10 = 12
         DoublyLinkedList<FreeBlock> testList = testMan.getFreeBlocksList();
         assertEquals(testList.getLength(), 0);
         assertEquals(han[0].getMemLength(), 5);
