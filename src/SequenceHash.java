@@ -305,6 +305,7 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
                 byte[] fromFile = new byte[(int)Math.ceil(idHandle
                     .getMemLength() / 4.0)];
                 if (offset == -1 || length == -1) {
+                    currSlot = (currSlot + 1) % 32;
                     continue;
                 }
                 // Read from file location for comparison

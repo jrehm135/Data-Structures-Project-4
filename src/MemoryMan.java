@@ -136,7 +136,8 @@ public class MemoryMan {
                 if (cur.getPos() + cur.getLength() < offset) {
                     freeBlocks.next();
                 }
-                else {// we find something that needs to get merged
+                else { 
+                    // we find something that needs to get merged
                     freeBlocks.insert(new FreeBlock(offset, length));
                     mergeBlocks();
                     alreadyInserted = true;
@@ -174,7 +175,7 @@ public class MemoryMan {
      * @throws IOException
      *             throws if there is file access error
      */
-    public String[] search(MemHandle handle[], String sequence[])
+    public String[] search(MemHandle[] handle, String[] sequence)
         throws IOException {
         Sequence sequenceIDToFind = new Sequence(sequence[0]);
         int idLength = (int)Math.ceil(handle[0].getMemLength() / 4.0);

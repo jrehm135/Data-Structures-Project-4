@@ -1,3 +1,4 @@
+import static org.junit.Assert.assertNotEquals;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -84,8 +85,20 @@ public class HashTest extends TestCase {
 
         hashTable.remove("AAAAA", new RandomAccessFile("bioFile.bin", "r"));
         testMan.remove(handles);
-        assertEquals(hashTable.getHandles((int)hashTable.hash("AAAAA", 1000)),
-            hans);
+        MemHandle[] actual = hashTable.getHandles((int)hashTable.hash("AAAAA",
+            1000));
+        assertEquals(actual[0].getMemLength(), -1);
+        assertEquals(actual[0].getMemLoc(), -1);
+        assertEquals(actual[1].getMemLength(), -1);
+        assertEquals(actual[1].getMemLoc(), -1);
+        hashTable.insert("AAAAA", handles, new RandomAccessFile("biofile.bin",
+            "rw"));
+        actual = hashTable.getHandles((int)hashTable.hash("AAAAA", 1000));
+        assertNotEquals(actual[0].getMemLength(), -1);
+        assertNotEquals(actual[0].getMemLoc(), -1);
+        assertNotEquals(actual[1].getMemLength(), -1);
+        assertNotEquals(actual[1].getMemLoc(), -1);
+        
     }
 
 
