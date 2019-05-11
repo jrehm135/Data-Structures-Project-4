@@ -22,7 +22,7 @@ public class MemoryMan {
      * @param memoryFile
      *            File to store sequences and ID's in.
      * @throws IOException
-     *             Throws when the emoryFile can't be found.
+     *             Throws when the emoryFile casn't be found.
      */
     MemoryMan(String memoryFile) {
         try {
@@ -44,12 +44,17 @@ public class MemoryMan {
      *            sequence ID to be inserted.
      * @param inputSequence
      *            DNA sequence to be inserted.
+     * @param inputLength
+     *            length of the sequence from the command file.
      * @return array of memory locations, the 0 index is the sequence ID
      *         and the 1 index is the sequence. Returns an empty array if there
      *         was in IOException
      * @throws IOException
      */
-    public MemHandle[] insert(String inputSequenceID, String inputSequence, int inputLength) {
+    public MemHandle[] insert(
+        String inputSequenceID,
+        String inputSequence,
+        int inputLength) {
         MemHandle[] insertLocations = new MemHandle[2];
         try {
             insertLocations[0] = insertID(inputSequenceID);
@@ -92,11 +97,14 @@ public class MemoryMan {
      * 
      * @param inputSequence
      *            Sequence to be inserted.
+     * @param inputLength
+     *            length of the string from command file.
      * @return Memory handle of sequence.
      * @throws IOException
      *             Throws when trying to write to invalid memory location.
      */
-    public MemHandle insertSequence(String inputSequence, int inputLength) throws IOException {
+    public MemHandle insertSequence(String inputSequence, int inputLength)
+        throws IOException {
         Sequence newInsert = new Sequence(inputSequence);
         int seqLength = (int)Math.ceil(inputLength / 4.0);
         int insertLoc = getNextMemPosition(seqLength);

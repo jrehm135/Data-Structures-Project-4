@@ -80,7 +80,7 @@ public class MemoryManTest extends TestCase {
         testMan.remove(handles);
 
         // Test less than block size
-        testMan.insert("CCC", "AAAATTTTCCCCGGGGAA",18); // 1 + 5 = 6
+        testMan.insert("CCC", "AAAATTTTCCCCGGGGAA", 18); // 1 + 5 = 6
 
         DoublyLinkedList<FreeBlock> testList = testMan.getFreeBlocksList();
         testList.moveToHead();

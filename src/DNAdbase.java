@@ -57,7 +57,8 @@ public class DNAdbase {
                             int searchFlag = hashTable.checkForDuplicate(seqID,
                                 seqFile);
                             if (searchFlag == 1) {
-                                handles = memManager.insert(seqID, sequence, length);
+                                handles = memManager.insert(seqID, sequence,
+                                    length);
                                 hashTable.insert(seqID, handles, seqFile);
                             }
                             else if (searchFlag == -1) {
