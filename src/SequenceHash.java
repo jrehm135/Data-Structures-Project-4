@@ -131,6 +131,13 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
                 currSlot = (currSlot + 1) % 32;
                 continue;
             }
+            else if (tableArray[(bucket * 32) + currSlot][0].getMemLoc() ==
+                    tombStone.getMemLoc() && tableArray[(bucket * 32) + currSlot][0].getMemLength() ==
+                            tombStone.getMemLength()) {
+                    // Move to next slot
+                    currSlot = (currSlot + 1) % 32;
+                    continue;
+            }
             // The given handles already exist in the table
             byte[] fromFile = new byte[(int)Math.ceil(tableArray[(bucket * 32)
                 + currSlot][0].getMemLength() / 4.0)];
