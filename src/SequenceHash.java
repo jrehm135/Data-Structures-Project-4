@@ -132,12 +132,13 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
                 currSlot = (currSlot + 1) % 32;
                 continue;
             }
-            else if (tableArray[(bucket * 32) + currSlot][0].getMemLoc() ==
-                    tombStone.getMemLoc() && tableArray[(bucket * 32) + currSlot][0].getMemLength() ==
-                            tombStone.getMemLength()) {
-                    // Move to next slot
-                    currSlot = (currSlot + 1) % 32;
-                    continue;
+            else if (tableArray[(bucket * 32) + currSlot][0]
+                .getMemLoc() == tombStone.getMemLoc() && tableArray[(bucket
+                    * 32) + currSlot][0].getMemLength() == tombStone
+                        .getMemLength()) {
+                // Move to next slot
+                currSlot = (currSlot + 1) % 32;
+                continue;
             }
             // The given handles already exist in the table
             byte[] fromFile = new byte[(int)Math.ceil(tableArray[(bucket * 32)
@@ -196,12 +197,12 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
                 return tableArray[(bucket * 32) + currSlot];
             }
             // We want to skip over tombstones
-            else if (tableArray[(bucket * 32) + currSlot][0].getMemLoc() ==
-                    -1 && tableArray[(bucket * 32) + currSlot][0].getMemLength() ==
-                            -1) {
-                    // Move to next slot
-                    currSlot = (currSlot + 1) % 32;
-                    continue;
+            else if (tableArray[(bucket * 32) + currSlot][0].getMemLoc() == -1
+                && tableArray[(bucket * 32) + currSlot][0]
+                    .getMemLength() == -1) {
+                // Move to next slot
+                currSlot = (currSlot + 1) % 32;
+                continue;
             }
             MemHandle idHandle = tableArray[(bucket * 32) + currSlot][0];
             int offset = idHandle.getMemLoc();
