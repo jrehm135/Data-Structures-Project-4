@@ -169,13 +169,13 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
             tableArray[lowestTombstone] = hashHandle;
             currSize++;
             // Store values in hash file
-            file.seek(((bucket * 32) + currSlot) * 16);
+            file.seek(lowestTombstone * 16);
             file.write(hashHandle[0].getMemLoc());
-            file.seek(((bucket * 32) + currSlot) * 16 + 4);
+            file.seek(lowestTombstone * 16 + 4);
             file.write(hashHandle[0].getMemLength());
-            file.seek(((bucket * 32) + currSlot) * 16 + 8);
+            file.seek(lowestTombstone * 16 + 8);
             file.write(hashHandle[1].getMemLoc());
-            file.seek(((bucket * 32) + currSlot) * 16 + 12);
+            file.seek(lowestTombstone * 16 + 12);
             file.write(hashHandle[1].getMemLength());
             return 1;
         }

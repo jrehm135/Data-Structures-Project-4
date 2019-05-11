@@ -186,11 +186,7 @@ public class HashTest extends TestCase {
                 "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2 + 10 = 12
         MemHandle[] handles31 = testMan.insert("TTTTGGGG",
                 "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 2 + 10 = 12
-        MemHandle[] handles32 = testMan.insert("AT",
-                "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
-        MemHandle[] handles33 = testMan.insert("TA",
-                "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
-
+        
         
         hashTable.insert("A", handles, new RandomAccessFile(
             "biofile.bin", "rw"));
@@ -264,6 +260,11 @@ public class HashTest extends TestCase {
         MemHandle[] remHan2 = hashTable.remove("TTTTGGGG", new RandomAccessFile("biofile.bin", "rw"));
         testMan.remove(remHan1);
         testMan.remove(remHan2);
+        
+        handles = testMan.insert("TTTTGGGG",
+                "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT"); // 1 + 10 = 11
+        hashTable.insert("TTTTGGGG", handles, new RandomAccessFile(
+                "biofile.bin", "rw"));
     }
 
 
