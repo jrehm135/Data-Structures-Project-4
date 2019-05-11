@@ -136,19 +136,20 @@ public class MemoryMan {
             }
             boolean alreadyInserted = false;
             while (freeBlocks.hasNext()) {
-                if (cur.getPos() + cur.getLength() < offset) {
-                    freeBlocks.next();
-                    cur = freeBlocks.getElement();
-                }
-                else {
-                    // we find something that needs to get merged
-                    freeBlocks.insert(new FreeBlock(offset, length));
-                    mergeBlocks();
+                if ((cur.getPos() + cur.getLength()) > offset) {
+                    freeBlocks.insertBefore(new FreeBlock(offset, length));
                     alreadyInserted = true;
                     break;
+                    }
+                else {
+                    // we find something that needs to get merged
+                    freeBlocks.next();
+                    cur = freeBlocks.getElement();
+                    
                 }
             }
             if (alreadyInserted) {
+                mergeBlocks();
                 continue;
             }
             // Before we finish, we need to check against the last value
