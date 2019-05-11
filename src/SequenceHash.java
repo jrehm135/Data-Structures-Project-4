@@ -320,7 +320,8 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
         long hashSlot = hash(seqID, tableSize);
         int bucket = (int)hashSlot / 32;
         int currSlot = (int)hashSlot % 32;
-
+        boolean tombFound = false;
+        
         do {
             try {
                 // look to see if slot is null, if so we can insert.
@@ -333,6 +334,9 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
                 byte[] fromFile = new byte[(int)Math.ceil(idHandle
                     .getMemLength() / 4.0)];
                 if (offset == -1 || length == -1) {
+                    if(!tombFound) {
+                        tombFound = true;
+                    }
                     currSlot = (currSlot + 1) % 32;
                     continue;
                 }
@@ -356,6 +360,9 @@ public class SequenceHash<T extends MemHandle> implements HashTable<MemHandle> {
             currSlot = (currSlot + 1) % 32;
         }
         while ((bucket * 32) + currSlot != hashSlot);
+        if(tombFound) {
+            return 1;
+        }
         return -1; // this means the bucket is full
     }
 
