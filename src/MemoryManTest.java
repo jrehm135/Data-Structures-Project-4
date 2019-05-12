@@ -40,21 +40,23 @@ public class MemoryManTest extends TestCase {
         MemHandle[] han = testMan.insert("AAAAA",
             "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT", 40); // 2 + 10 = 12
         testMan.insert("AAAA", "AAAATTTTCCCCGGGAAAACCCCGGGGTTTTAAAATTTT", 40);
-        // 2 + 10 = 12
+        try {
+            String[] test = { "AAAAA",
+                "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT" };
+            testMan.print(han);
+            testMan.search(han, test);
+        }
+
+        catch (IOException e) {
+            System.out.println("Error in search");
+        }
         DoublyLinkedList<FreeBlock> testList = testMan.getFreeBlocksList();
         assertEquals(testList.getLength(), 0);
         assertEquals(han[0].getMemLength(), 5);
         assertEquals(han[0].getMemLoc(), 0);
         assertEquals(han[1].getMemLength(), 40);
         assertEquals(han[1].getMemLoc(), 2);
-        String[] test = { "AAAAA", "AAAATTTTCCCCGGGGAAAACCCCGGGGTTTTAAAATTTT" };
-        try {
-            testMan.search(han, test);
-            testMan.print(han);
-        }
-        catch (IOException e) {
-            System.out.println("Error in search");
-        }
+
     }
 
 
